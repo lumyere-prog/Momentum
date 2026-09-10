@@ -13,28 +13,30 @@
 
 </head>
 
-<body class="min-h-screen bg-[#09090b] text-zinc-100 antialiased">
+<body class="min-h-screen bg-white text-zinc-100 antialiased">
 
 
 <div class="min-h-screen">
 
     {{-- NAVBAR --}}
-    <header class="border-b border-zinc-800/80 bg-[#09090b]/95">
-        <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
+    <header class="\">
+        <div class="flex items-center justify-between px-6">
 
-            <div class="flex items-center gap-3">
+            <div class="flex justify-around gap-155">
+                <div class="flex gap-5">
+                    <div class="flex h-20 w-20">
+                        <img src="{{ asset('images/logo.png') }}" alt="Logo">
+                    </div>
 
-                <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-white text-sm font-black text-black">
-                    ✓
+                    <div>
+                        <p class="text-lg text-zinc-900 font-bold h-20 w-70 mt-5">
+                            Make a list, Conquer your day!
+                        </p>
+                    </div>
                 </div>
-
                 <div>
-                    <h1 class="text-sm font-semibold tracking-wide">
-                        Momentum
-                    </h1>
-
-                    <p class="text-xs text-zinc-500">
-                        Make a list, Conquer your day!
+                    <p class="text-xs mt-7 font-medium uppercase tracking-[0.2em] text-zinc-900">
+                        {{ now()->format('l, F j') }}
                     </p>
                 </div>
 
@@ -46,31 +48,14 @@
 
 
     {{-- MAIN --}}
-    <main class="mx-auto max-w-7xl px-6 py-10">
+    <main class="mx-auto max-w-7xl px-6 py-1">
 
         {{-- HEADER --}}
-        <div class="mb-10 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
-
-            <div>
-
-                <p class="mb-2 text-xs font-medium uppercase tracking-[0.2em] text-violet-400">
-                    {{ now()->format('l, F j') }}
-                </p>
-
-                <h2 class="text-3xl font-semibold tracking-tight text-white sm:text-4xl">
-                    Good morning.
-                </h2>
-
-                <p class="mt-2 text-sm text-zinc-500">
-                    Let's get a few things done today.
-                </p>
-
-            </div>
-
+        <div class="mb-2 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
             <button
                 id="add-task"
                 type="button"
-                class="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-4 py-2.5 text-sm font-semibold text-black transition hover:bg-zinc-200"
+                class="inline-flex items-center justify-center gap-2 rounded-lg bg-black px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-zinc-600 h-10 w-302 cursor-pointer"
             >
                 <span class="text-base">+</span>
                 Add task
@@ -80,7 +65,7 @@
 
 
         {{-- STATS --}}
-        <div class="mb-8 grid grid-cols-1 gap-px overflow-hidden rounded-xl border border-zinc-800 bg-zinc-800 sm:grid-cols-3">
+        <div class="mb-2 grid grid-cols-1 gap-px overflow-hidden rounded-xl border border-zinc-800 bg-zinc-800 sm:grid-cols-3">
 
             {{-- TODAY'S TASKS --}}
             <div class="bg-[#0c0c0f] p-5">
@@ -164,7 +149,7 @@
 
 
         {{-- CONTENT --}}
-        <div class="grid gap-6 lg:grid-cols-[1fr_340px]">
+        <div class="grid gap-2 lg:grid-cols-[1fr_340px]">
 
 
             {{-- TASK PANEL --}}
@@ -208,7 +193,7 @@
 
 
             {{-- SIDEBAR --}}
-            <aside class="space-y-6">
+            <aside class="space-y-2">
 
 
                 {{-- PRODUCTIVITY --}}
@@ -227,7 +212,7 @@
                     </div>
 
 
-                    <div class="mt-6 flex items-center gap-5">
+                    <div class="mt-1 flex items-center gap-3">
 
                         <div
                             id="productivity-circle"
@@ -333,20 +318,6 @@
 
     </main>
 
-
-    {{-- FOOTER --}}
-    <footer class="mx-auto max-w-7xl px-6 py-8">
-
-        <div class="border-t border-zinc-900 pt-6 text-center">
-
-            <p class="text-[11px] text-zinc-1000">
-                Momentum · Make a list, Conquer your day!
-
-            </p>
-
-        </div>
-
-    </footer>
 
 </div>
 
@@ -538,8 +509,8 @@
         </button>
 
     </div>
-
 </div>
+
 
 </body>
 </html>

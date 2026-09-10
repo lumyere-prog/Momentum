@@ -178,34 +178,26 @@ fetch('/tasks', {
     // ==========================================
 
     function getOverdueTasks() {
+    // Get today's date in YYYY-MM-DD format
+    const today = new Date().toISOString().split('T')[0];
 
-        const today = new Date();
+    return tasks.filter(task => {
+        // If it's already completed, it's not a debt
+        if (task.completed) return false;
 
-        today.setHours(0, 0, 0, 0);
+        // Get the date (handling both JS camelCase and Laravel snake_case just in case)
+        const dateString = task.due_date || task.dueDate;
+        
+        // If there is no due date, it can't be overdue
+        if (!dateString) return false;
 
+        // Clean Laravel's timestamp (e.g., "2026-09-10T00:00:00.000000Z" -> "2026-09-10")
+        const cleanDate = dateString.split('T')[0];
 
-        return tasks.filter(task => {
-
-            if (task.completed || !task.dueDate) {
-                return false;
-            }
-
-
-            const dueDate = new Date(task.dueDate);
-
-            if (isNaN(dueDate.getTime())) {
-                return false;
-            }
-
-
-            dueDate.setHours(0, 0, 0, 0);
-
-
-            return dueDate < today;
-
-        });
-
-    }
+        // It is overdue if the due date is strictly before today
+        return cleanDate < today;
+    });
+}
 
 
     // ==========================================
@@ -213,46 +205,27 @@ fetch('/tasks', {
     // ==========================================
 
     function updateTaskDebt() {
+    const overdueTasks = getOverdueTasks();
+    const debt = overdueTasks.length;
 
-        const overdueTasks = getOverdueTasks();
+    // Grab the elements from the DOM
+    const debtElement = document.getElementById('task-debt');
+    const debtMessage = document.getElementById('task-debt-message');
 
-        const debt = overdueTasks.length;
-
-
-        if (debtElement) {
-
-            debtElement.textContent = debt;
-
-        }
-
-
-        if (debtMessage) {
-
-            if (debt === 0) {
-
-                debtMessage.textContent =
-                    "You're all caught up. Keep the momentum going.";
-
-            }
-
-            else if (debt === 1) {
-
-                debtMessage.textContent =
-                    "You have 1 overdue task. Take care of it.";
-
-            }
-
-            else {
-
-                debtMessage.textContent =
-                    `You have ${debt} overdue tasks. Don't let them pile up.`;
-
-            }
-
-        }
-
+    if (debtElement) {
+        debtElement.textContent = debt;
     }
 
+    if (debtMessage) {
+        if (debt === 0) {
+            debtMessage.textContent = "You're all caught up. Keep the momentum going.";
+        } else if (debt === 1) {
+            debtMessage.textContent = "You have 1 overdue task. Take care of it.";
+        } else {
+            debtMessage.textContent = `You have ${debt} overdue tasks. Don't let them pile up.`;
+        }
+    }
+}
 
     // ==========================================
     // UPDATE STATS
@@ -342,7 +315,7 @@ fetch('/tasks', {
         );
         }
 
-
+        updateTaskDebt();
 
         
         // Sidebar task count

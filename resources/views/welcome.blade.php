@@ -6,57 +6,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
+    <title>Momentum</title>
 
-<title>Momentum</title>
-
-@vite(['resources/css/app.css', 'resources/js/app.js'])
-
-
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
 <body class="min-h-screen bg-white text-zinc-100 antialiased">
 
-
 <div class="min-h-screen">
 
     {{-- NAVBAR --}}
-    <header class="\">
-        <div class="flex items-center justify-between px-6">
+    <header>
+        <div class="mx-auto w-full px-10 py-2">
+            <div class="flex flex-col gap-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:py-4">
 
-            <div class="flex justify-around gap-155">
-                <div class="flex gap-5">
-                    <div class="flex h-20 w-20">
-                        <img src="{{ asset('images/logo.png') }}" alt="Logo">
+                <div class="flex min-w-0 items-center gap-3 sm:gap-5">
+
+                    <div class="flex h-14 w-14 shrink-0 sm:h-16 sm:w-16 md:h-20 md:w-20">
+                        <img
+                            src="{{ asset('images/logo.png') }}"
+                            alt="Logo"
+                            class="h-full w-full object-contain"
+                        >
                     </div>
 
-                    <div>
-                        <p class="text-lg text-zinc-900 font-bold h-20 w-70 mt-5">
+                    <div class="min-w-0">
+                        <p class="mt-0 text-sm font-bold text-zinc-900 sm:text-base md:text-lg">
                             Make a list, Conquer your day!
                         </p>
                     </div>
+
                 </div>
-                <div>
-                    <p class="text-xs mt-7 font-medium uppercase tracking-[0.2em] text-zinc-900">
+
+                <div class="w-full sm:w-auto">
+                    <p class="text-[10px] font-medium uppercase tracking-[0.15em] text-zinc-900 sm:text-xs sm:tracking-[0.2em]">
                         {{ now()->format('l, F j') }}
                     </p>
                 </div>
 
             </div>
-
-
         </div>
     </header>
 
 
     {{-- MAIN --}}
-    <main class="mx-auto max-w-7xl px-6 py-1">
+    <main class="w-full px-10 py-2">
 
         {{-- HEADER --}}
-        <div class="mb-2 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
+        <div class="mb-2 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+
             <button
                 id="add-task"
                 type="button"
-                class="inline-flex items-center justify-center gap-2 rounded-lg bg-black px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-zinc-600 h-10 w-302 cursor-pointer"
+                class="inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-black px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-zinc-600 cursor-pointer sm:w-full"
             >
                 <span class="text-base">+</span>
                 Add task
@@ -66,10 +68,10 @@
 
 
         {{-- STATS --}}
-        <div class="mb-2 grid grid-cols-1 gap-px overflow-hidden rounded-xl border border-zinc-800 bg-zinc-800 sm:grid-cols-3">
+        <div class="mb-2 grid grid-cols-1 gap-px overflow-hidden rounded-xl border border-zinc-800 bg-zinc-800 sm:grid-cols-2">
 
             {{-- TODAY'S TASKS --}}
-            <div class="bg-[#0c0c0f] p-5">
+            <div class="min-w-0 bg-[#0c0c0f] p-4 sm:p-5">
 
                 <p class="text-xs text-zinc-500">
                     Today's tasks
@@ -94,7 +96,7 @@
 
 
             {{-- COMPLETED --}}
-            <div class="bg-[#0c0c0f] p-5">
+            <div class="min-w-0 bg-[#0c0c0f] p-4 sm:p-5">
 
                 <p class="text-xs text-zinc-500">
                     Completed
@@ -120,85 +122,8 @@
 
             </div>
 
-
-            {{-- EXPERIENCE --}}
-            <div class="bg-[#0c0c0f] p-5">
-
-                <p class="text-xs text-zinc-500">
-                    Experience
-                </p>
-
-                <div class="mt-3 flex items-end gap-2">
-
-                    <span
-                        id="total-exp"
-                        class="text-2xl font-semibold text-white"
-                    >
-                        0
-                    </span>
-
-                    <span class="pb-0.5 text-xs text-violet-400">
-                        XP
-                    </span>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-
-        {{-- CONTENT --}}
-        <div class="grid gap-2 lg:grid-cols-[1fr_340px]">
-
-
-            {{-- TASK PANEL --}}
-            <section class="overflow-hidden rounded-xl border border-zinc-800 bg-[#0c0c0f]">
-
-                {{-- TASK HEADER --}}
-                <div class="flex items-center justify-between border-b border-zinc-800 px-5 py-4">
-
-                    <div>
-
-                        <h3 class="text-sm font-semibold text-white">
-                            Today's tasks
-                        </h3>
-
-                        <p class="mt-1 text-xs text-zinc-600">
-                            <span id="remaining-tasks">0</span>
-                            tasks remaining
-                        </p>
-
-                    </div>
-
-                    <button
-                        type="button"
-                        class="text-xs font-medium text-zinc-500 transition hover:text-white"
-                    >
-                        View all
-                    </button>
-
-                </div>
-
-
-                {{-- TASKS --}}
-                {{-- JavaScript will render tasks here --}}
-                <div
-                    id="task-list"
-                    class="divide-y divide-zinc-800/70"
-                >
-                </div>
-
-            </section>
-
-
-            {{-- SIDEBAR --}}
-            <aside class="space-y-2">
-
-
-                {{-- PRODUCTIVITY --}}
-                <div class="rounded-xl border border-zinc-800 bg-[#0c0c0f] p-5">
+            {{-- PRODUCTIVITY --}}
+                <div class="rounded-xl border border-zinc-800 bg-[#0c0c0f] p-4 sm:p-5">
 
                     <div class="flex items-center justify-between">
 
@@ -213,29 +138,35 @@
                     </div>
 
 
-                    <div class="mt-1 flex items-center gap-3">
+                    <div class="mt-3 flex flex-col gap-4 min-[400px]:flex-row min-[400px]:items-center">
 
                         <div
                             id="productivity-circle"
-                            class="productivity-circle relative flex h-24 w-24 shrink-0 items-center justify-center rounded-full"
+                            class="productivity-circle relative mx-auto flex h-24 w-24 shrink-0 items-center justify-center rounded-full min-[400px]:mx-0"
                             style="--progress: 0%;"
                         >
                             <div class="absolute inset-[7px] flex items-center justify-center rounded-full bg-[#0c0c0f]">
                                 <div class="text-center">
-                                    <p id="sidebar-percentage" class="text-xl font-semibold text-white">
+
+                                    <p
+                                        id="sidebar-percentage"
+                                        class="text-xl font-semibold text-white"
+                                    >
                                         0%
                                     </p>
 
                                     <p class="text-[9px] text-zinc-600">
                                         score
                                     </p>
+
                                 </div>
                             </div>
                         </div>
 
-                        <div class="flex-1">
 
-                            <div class="mb-3 flex items-center justify-between">
+                        <div class="min-w-0 flex-1">
+
+                            <div class="mb-3 flex items-center justify-between gap-2">
 
                                 <span class="text-xs text-zinc-500">
                                     Completed
@@ -259,7 +190,7 @@
 
                             </div>
 
-                            <p class="mt-3 text-[11px] text-zinc-600">
+                            <p class="mt-3 text-[11px] leading-4 text-zinc-600">
                                 Keep completing tasks to improve your score.
                             </p>
 
@@ -271,9 +202,9 @@
 
 
                 {{-- TASK DEBT --}}
-                <div class="rounded-xl border border-zinc-800 bg-[#0c0c0f] p-5">
+                <div class="rounded-xl border border-zinc-800 bg-[#0c0c0f] p-4 sm:p-5">
 
-                    <div class="flex items-start justify-between">
+                    <div class="flex items-start justify-between gap-4">
 
                         <div>
 
@@ -290,7 +221,7 @@
 
                         </div>
 
-                        <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-red-400/10 text-sm">
+                        <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-red-400/10 text-sm">
                             💀
                         </div>
 
@@ -313,7 +244,47 @@
 
                 </div>
 
-            </aside>
+        </div>
+
+
+
+        {{-- CONTENT --}}
+        <div class="grid grid-cols-1 gap-2 lg:grid-cols-[minmax(0,1fr)_-10px]">
+
+
+            {{-- TASK PANEL --}}
+            <section class="min-w-0 overflow-hidden rounded-xl border border-zinc-800 bg-[#0c0c0f]">
+
+                {{-- TASK HEADER --}}
+                <div class="flex flex-col gap-3 border-b border-zinc-800 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+
+                    <div class="min-w-0">
+
+                        <h3 class="text-sm font-semibold text-white">
+                            Today's tasks
+                        </h3>
+
+                        <p class="mt-1 text-xs text-zinc-600">
+                            <span id="remaining-tasks">0</span>
+                            tasks remaining
+                        </p>
+
+                    </div>
+
+                   
+
+                </div>
+
+
+                {{-- TASKS --}}
+                {{-- JavaScript will render tasks here --}}
+                <div
+                    id="task-list"
+                    class="divide-y divide-zinc-800/70"
+                >
+                </div>
+
+            </section>
 
         </div>
 
@@ -332,9 +303,9 @@
     class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/50 px-4 backdrop-blur-sm"
 >
 
-    <div class="w-full max-w-md rounded-xl border border-zinc-800 bg-[#0c0c0f] p-6 shadow-xl">
+    <div class="w-full max-w-md rounded-xl border border-zinc-800 bg-[#0c0c0f] p-5 shadow-xl sm:p-6">
 
-        <div class="mb-5 flex items-center justify-between">
+        <div class="mb-5 flex items-center justify-between gap-4">
 
             <h3 class="text-sm font-semibold text-white">
                 Add New Task
@@ -343,7 +314,7 @@
             <button
                 id="close-modal"
                 type="button"
-                class="text-zinc-500 transition hover:text-white"
+                class="shrink-0 text-zinc-500 transition hover:text-white"
             >
                 &times;
             </button>
@@ -378,7 +349,7 @@
 
 
             {{-- PRIORITY + CATEGORY --}}
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 gap-4 min-[400px]:grid-cols-2">
 
                 <div>
 
@@ -465,11 +436,11 @@
     class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/50 px-4 backdrop-blur-sm"
 >
 
-    <div class="w-full max-w-md rounded-xl border border-zinc-800 bg-[#0c0c0f] p-6 shadow-xl">
+    <div class="w-full max-w-md rounded-xl border border-zinc-800 bg-[#0c0c0f] p-5 shadow-xl sm:p-6">
 
-        <div class="flex items-center justify-between">
+        <div class="flex items-center justify-between gap-4">
 
-            <div>
+            <div class="min-w-0">
 
                 <h3 class="text-sm font-semibold text-white">
                     Task Debt
@@ -484,7 +455,7 @@
             <button
                 id="close-debt-modal"
                 type="button"
-                class="text-zinc-500 transition hover:text-white"
+                class="shrink-0 text-zinc-500 transition hover:text-white"
             >
                 &times;
             </button>
@@ -510,6 +481,7 @@
         </button>
 
     </div>
+
 </div>
 
 

@@ -73,7 +73,7 @@
                     </p>
                 </div>
 
-                <button class="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-4 py-2.5 text-sm font-semibold text-black transition hover:bg-zinc-200">
+                <button id="add-task" class="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-4 py-2.5 text-sm font-semibold text-black transition hover:bg-zinc-200">
                     <span class="text-base">+</span>
                     Add task
                 </button>
@@ -88,7 +88,7 @@
                     <p class="text-xs text-zinc-500">Today's tasks</p>
 
                     <div class="mt-3 flex items-end gap-2">
-                        <span class="text-2xl font-semibold">12</span>
+                        <span id="total-tasks" class="text-2xl font-semibold"></span>
                         <span class="pb-0.5 text-xs text-zinc-600">tasks</span>
                     </div>
                 </div>
@@ -97,25 +97,23 @@
                     <p class="text-xs text-zinc-500">Completed</p>
 
                     <div class="mt-3 flex items-end gap-2">
-                        <span class="text-2xl font-semibold">8</span>
-                        <span class="pb-0.5 text-xs text-emerald-400">67%</span>
+                        <span id="completed-tasks" class="text-2xl font-semibold"></span>
+                        <span id="completion-percentage" class="pb-0.5 text-xs text-emerald-400"></span>
                     </div>
                 </div>
 
-                <div class="bg-[#0c0c0f] p-5">
+               <div class="bg-[#0c0c0f] p-5">
                     <p class="text-xs text-zinc-500">Current streak</p>
-
                     <div class="mt-3 flex items-end gap-2">
-                        <span class="text-2xl font-semibold">7</span>
+                        <span id="current-streak" class="text-2xl font-semibold">7</span>
                         <span class="pb-0.5 text-xs text-orange-400">🔥 days</span>
                     </div>
                 </div>
 
                 <div class="bg-[#0c0c0f] p-5">
                     <p class="text-xs text-zinc-500">Experience</p>
-
                     <div class="mt-3 flex items-end gap-2">
-                        <span class="text-2xl font-semibold">240</span>
+                        <span id="total-exp" class="text-2xl font-semibold">0</span>
                         <span class="pb-0.5 text-xs text-violet-400">XP</span>
                     </div>
                 </div>
@@ -138,9 +136,10 @@
                                 Today's tasks
                             </h3>
 
-                            <p class="mt-1 text-xs text-zinc-600">
-                                4 tasks remaining
-                            </p>
+                           <p class="mt-1 text-xs text-zinc-600"><span id="remaining-tasks">4
+
+                           </span> tasks remaining</p>
+
                         </div>
 
                         <button class="text-xs font-medium text-zinc-500 transition hover:text-white">
@@ -151,7 +150,7 @@
 
 
                     {{-- TASKS --}}
-                    <div class="divide-y divide-zinc-800/70">
+                    <div id="task-list" class="divide-y divide-zinc-800/70">
 
 
                         {{-- TASK --}}
@@ -341,8 +340,8 @@
                                 <div class="absolute inset-[-7px] rounded-full border-[7px] border-violet-500 border-b-transparent border-l-transparent rotate-[-35deg]"></div>
 
                                 <div class="text-center">
-                                    <p class="text-xl font-semibold">
-                                        78%
+                                    <p id="sidebar-percentage" class="text-xl font-semibold">
+                                        
                                     </p>
 
                                     <p class="text-[9px] text-zinc-600">
@@ -360,13 +359,12 @@
                                         Completed
                                     </span>
 
-                                    <span class="text-xs font-medium">
-                                        8 / 12
+                                    <span id="sidebar-task-count" class="text-xs font-medium">
                                     </span>
                                 </div>
 
                                 <div class="h-1.5 overflow-hidden rounded-full bg-zinc-800">
-                                    <div class="h-full w-[67%] rounded-full bg-violet-500"></div>
+                                    <div id="progress-bar" class="h-full w-[67%] rounded-full bg-violet-500"></div>
                                 </div>
 
                                 <p class="mt-3 text-[11px] text-zinc-600">
@@ -562,6 +560,50 @@
         </footer>
 
     </div>
+
+
+    <!-- ADD TASK MODAL -->
+<div id="task-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
+    <div class="w-full max-w-md rounded-xl border border-zinc-800 bg-[#0c0c0f] p-6 shadow-xl">
+        
+        <div class="flex items-center justify-between mb-5">
+            <h3 class="text-sm font-semibold text-white">Add New Task</h3>
+            <button id="close-modal" class="text-zinc-500 hover:text-white transition">&times;</button>
+        </div>
+
+        <form id="task-form" class="space-y-4">
+            <div>
+                <label class="mb-1.5 block text-xs text-zinc-400">Task Title</label>
+                <input type="text" id="task-title" required class="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-white focus:border-violet-500 focus:outline-none" placeholder="e.g. Finish Laravel dashboard" />
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="mb-1.5 block text-xs text-zinc-400">Priority</label>
+                    <select id="task-priority" class="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-white focus:border-violet-500 focus:outline-none">
+                        <option value="Low">Low</option>
+                        <option value="Medium">Medium</option>
+                        <option value="High">High</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="mb-1.5 block text-xs text-zinc-400">Category</label>
+                    <input type="text" id="task-category" class="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-white focus:border-violet-500 focus:outline-none" placeholder="e.g. Development" />
+                </div>
+            </div>
+
+            <div>
+                <label class="mb-1.5 block text-xs text-zinc-400">Due Date</label>
+                <input type="text" id="task-due-date" class="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-white focus:border-violet-500 focus:outline-none" placeholder="e.g. Today" />
+            </div>
+
+            <button type="submit" class="mt-4 w-full rounded-lg bg-white px-4 py-2.5 text-sm font-semibold text-black transition hover:bg-zinc-200">
+                Save Task
+            </button>
+        </form>
+
+    </div>
+</div>
 
 </body>
 </html>

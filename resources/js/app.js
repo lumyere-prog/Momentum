@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    // ==========================================
+// ==========================================
     // RENDER TASKS
     // ==========================================
 
@@ -141,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
             taskList.appendChild(taskElement);
         });
 
-
+        // The crashing code has been removed from here. We just call updateStats()!
         updateStats();
     }
 
@@ -318,75 +318,53 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 
-    // ==========================================
-    // UPDATE DASHBOARD STATS
-    // ==========================================
-
-    function updateStats() {
+function updateStats() {
 
         const total = tasks.length;
-
-        const completed =
-            tasks.filter(task => task.completed).length;
-
-        const remaining =
-            total - completed;
-
+        const completed = tasks.filter(task => task.completed).length;
+        const remaining = total - completed;
+        
+        // Completion percentage
+        const percentage = total === 0 ? 0 : Math.round((completed / total) * 100);
 
         // Today's tasks
-
-        const totalElement =
-            document.getElementById('total-tasks');
-
-        if (totalElement) {
-            totalElement.textContent = total;
-        }
-
+        const totalElement = document.getElementById('total-tasks');
+        if (totalElement) totalElement.textContent = total;
 
         // Completed
-
-        const completedElement =
-            document.getElementById('completed-tasks');
-
-        if (completedElement) {
-            completedElement.textContent = completed;
-        }
-
+        const completedElement = document.getElementById('completed-tasks');
+        if (completedElement) completedElement.textContent = completed;
 
         // Remaining
+        const remainingElement = document.getElementById('remaining-tasks');
+        if (remainingElement) remainingElement.textContent = remaining;
 
-        const remainingElement =
-            document.getElementById('remaining-tasks');
-
-        if (remainingElement) {
-            remainingElement.textContent = remaining;
-        }
-
-
-        // Completion percentage
-
-        const percentage =
-            total === 0
-                ? 0
-                : Math.round((completed / total) * 100);
+        // Top Stats percentage
+        const percentageElement = document.getElementById('completion-percentage');
+        if (percentageElement) percentageElement.textContent = `${percentage}%`;
 
 
-        const percentageElement =
-            document.getElementById('completion-percentage');
+      // Progress bar (Sidebar)
+        const progressBar = document.getElementById('progress-bar');
+        if (progressBar) progressBar.style.width = `${percentage}%`;
 
-        if (percentageElement) {
-            percentageElement.textContent = `${percentage}%`;
-        }
+        // Productivity Meter (Sidebar Percentage & Text)
+        const sidebarPercentage = document.getElementById('sidebar-percentage');
+        if (sidebarPercentage) sidebarPercentage.textContent = `${percentage}%`;
 
+        const sidebarTaskCount = document.getElementById('sidebar-task-count');
+        if (sidebarTaskCount) sidebarTaskCount.textContent = `${completed} / ${total}`;
 
-        // Progress bar
+ 
+        // Let's grant 30 XP per completed task!
+        const xpEarned = completed * 30; 
+        const expElement = document.getElementById('total-exp');
+        if (expElement) expElement.textContent = xpEarned;
 
-        const progressBar =
-            document.getElementById('progress-bar');
+        // Static streak for now (you can connect this to a real date-tracker later)
+        const streakElement = document.getElementById('current-streak');
+        if (streakElement) streakElement.textContent = 7;
 
-        if (progressBar) {
-            progressBar.style.width = `${percentage}%`;
-        }
     }
 
 

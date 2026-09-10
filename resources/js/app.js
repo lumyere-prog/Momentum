@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 <!-- DATE -->
 
-                <span class="hidden text-xs text-zinc-600 sm:block">
+                <span class="hidden text-xs text-zinc-1000 sm:block">
                     ${task.dueDate || 'Today'}
                 </span>
 
@@ -351,6 +351,17 @@ function updateStats() {
         // Productivity Meter (Sidebar Percentage & Text)
         const sidebarPercentage = document.getElementById('sidebar-percentage');
         if (sidebarPercentage) sidebarPercentage.textContent = `${percentage}%`;
+
+        const productivityCircle = document.getElementById('productivity-circle');
+
+        if (productivityCircle) {
+            productivityCircle.style.background = `
+                conic-gradient(
+                    #8b5cf6 ${percentage}%,
+                    #27272a ${percentage}%
+                )
+            `;
+        }
 
         const sidebarTaskCount = document.getElementById('sidebar-task-count');
         if (sidebarTaskCount) sidebarTaskCount.textContent = `${completed} / ${total}`;

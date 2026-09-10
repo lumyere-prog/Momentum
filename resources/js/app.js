@@ -4,7 +4,24 @@ document.addEventListener('DOMContentLoaded', () => {
     // TASK DATA
     // ==========================================
 
-    let tasks = JSON.parse(localStorage.getItem('taskflow_tasks')) || [];
+   // Remove this line:
+// let tasks = JSON.parse(localStorage.getItem('taskflow_tasks')) || [];
+
+// Replace it with this:
+let tasks = [];
+
+// Fetch real tasks from the database when the page loads
+fetch('/tasks', {
+    headers: {
+        'Accept': 'application/json'
+    }
+})
+.then(response => response.json())
+.then(data => {
+    tasks = data;
+    renderTasks();
+})
+.catch(error => console.error('Error loading tasks:', error));
 
 
     // ==========================================
@@ -327,7 +344,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-
+        
         // Sidebar task count
 
         const sidebarTaskCount =
@@ -362,6 +379,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     }
 
+
+   function formatDisplayDate(dateString) {
+    if (!dateString) return 'Today';
+    
+    // Extract just the YYYY-MM-DD part by splitting at the 'T'
+    const cleanDate = dateString.split('T')[0];
+    
+    // Get today's actual date in YYYY-MM-DD format
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Compare the clean date to today
+    return cleanDate === today ? 'Today' : cleanDate;
+}
 
     // ==========================================
     // RENDER TASKS
@@ -474,10 +504,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
 
 
-                <!-- DATE -->
-
+               <!-- DATE -->
                 <span class="hidden text-xs text-zinc-1000 sm:block">
-                    ${escapeHtml(task.dueDate || 'Today')}
+                    ${escapeHtml(formatDisplayDate(task.due_date || task.dueDate))}
                 </span>
 
 
@@ -509,58 +538,60 @@ document.addEventListener('DOMContentLoaded', () => {
     // CREATE TASK
     // ==========================================
 
-    taskForm.addEventListener('submit', (event) => {
+    // ==========================================
+    // CREATE TASK (SAVING TO LARAVEL DB)
+    // ==========================================
 
+    taskForm.addEventListener('submit', async (event) => {
         event.preventDefault();
 
+        // 1. Gather the data from the modal
+        const titleInput = document.getElementById('task-title');
+        const priorityInput = document.getElementById('task-priority');
+        const categoryInput = document.getElementById('task-category');
+        const dueDateInput = document.getElementById('task-due-date');
+        
+        // 2. Get the CSRF security token
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
 
-        const titleInput =
-            document.getElementById('task-title');
+        try {
+            // 3. Send the POST request to your Laravel backend
+            const response = await fetch('/tasks', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({
+                    title: titleInput.value.trim(),
+                    priority: priorityInput.value,
+                    category: categoryInput.value.trim(),
+                    due_date: dueDateInput.value
+                })
+            });
 
-        const priorityInput =
-            document.getElementById('task-priority');
+            // 4. Handle the response
+            if (response.ok) {
+                const newRecord = await response.json();
+                
+                // Add the new task to your local array and re-render
+                tasks.unshift(newRecord.task);
+                renderTasks();
 
-        const categoryInput =
-            document.getElementById('task-category');
+                // Reset and close the modal
+                taskForm.reset();
+                taskModal.classList.add('hidden');
+            } else {
+                // Handle validation errors (like picking a past date)
+                const errorData = await response.json();
+                console.error("Validation Failed:", errorData.errors);
+                alert("Failed to save task. Please check your inputs.");
+            }
 
-        const dueDateInput =
-            document.getElementById('task-due-date');
-
-
-        if (!titleInput || !priorityInput || !categoryInput || !dueDateInput) {
-            return;
+        } catch (error) {
+            console.error("Network Error:", error);
         }
-
-
-        const title =
-            titleInput.value.trim();
-
-
-        if (!title) {
-            return;
-        }
-
-
-        const newTask = {
-
-            id: Date.now(),
-
-            title: title,
-
-            priority: priorityInput.value,
-
-            category: categoryInput.value.trim(),
-
-            dueDate: dueDateInput.value,
-
-            completed: false,
-
-            postponedCount: 0,
-
-            createdAt: new Date().toISOString()
-
-        };
-
 
         tasks.unshift(newTask);
 
@@ -592,28 +623,46 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Complete
 
+       // COMPLETE
         if (completeButton) {
-
-            const id =
-                Number(completeButton.dataset.id);
-
-
-            const task =
-                tasks.find(task => task.id === id);
-
+            const id = Number(completeButton.dataset.id);
+            const task = tasks.find(task => task.id === id);
 
             if (task) {
+                // 1. Instantly update the UI for a snappy user experience
+                task.completed = !task.completed;
+                renderTasks(); 
 
-                task.completed =
-                    !task.completed;
-
-
-                saveTasks();
-
-                renderTasks();
-
+                // 2. Send the update to the database
+                // 2. Send the update to the database
+               // 2. Send the update to the database
+                fetch(`/tasks/${id}/complete`, { // <-- Updated URL
+                    method: 'POST',              // <-- Changed to POST
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') 
+                    }
+                })
+                .then(async response => {
+                    if (!response.ok) {
+                        // This intercepts the Laravel error and prints it for us!
+                        const errorDetails = await response.json().catch(() => response.text());
+                        console.error("Laravel Error Details:", errorDetails);
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Successfully updated:', data);
+                })
+                .catch(error => {
+                    console.error('Failed to sync to database:', error);
+                    // Revert the UI if the database failed
+                    task.completed = !task.completed;
+                    renderTasks();
+                });
             }
-
         }
 
 

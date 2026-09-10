@@ -5,17 +5,17 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-```
+
 <title>Momentum</title>
 
 @vite(['resources/css/app.css', 'resources/js/app.js'])
-```
+
 
 </head>
 
 <body class="min-h-screen bg-[#09090b] text-zinc-100 antialiased">
 
-```
+
 <div class="min-h-screen">
 
     {{-- NAVBAR --}}
@@ -34,30 +34,12 @@
                     </h1>
 
                     <p class="text-xs text-zinc-500">
-                        Personal workspace
+                        Make a list, Conquer your day!
                     </p>
                 </div>
 
             </div>
 
-            <div class="flex items-center gap-4">
-
-                <div class="hidden items-center gap-2 rounded-full border border-zinc-800 bg-zinc-900 px-3 py-1.5 sm:flex">
-                    <span class="text-sm">🔥</span>
-
-                    <span class="text-xs font-medium text-zinc-300">
-                        7 day streak
-                    </span>
-                </div>
-
-                <button
-                    type="button"
-                    class="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-800 text-zinc-400 transition hover:border-zinc-700 hover:bg-zinc-900 hover:text-white"
-                >
-                    ⚙
-                </button>
-
-            </div>
 
         </div>
     </header>
@@ -98,8 +80,9 @@
 
 
         {{-- STATS --}}
-        <div class="mb-8 grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-zinc-800 bg-zinc-800 md:grid-cols-4">
+        <div class="mb-8 grid grid-cols-1 gap-px overflow-hidden rounded-xl border border-zinc-800 bg-zinc-800 sm:grid-cols-3">
 
+            {{-- TODAY'S TASKS --}}
             <div class="bg-[#0c0c0f] p-5">
 
                 <p class="text-xs text-zinc-500">
@@ -110,7 +93,7 @@
 
                     <span
                         id="total-tasks"
-                        class="text-2xl font-semibold"
+                        class="text-2xl font-semibold text-white"
                     >
                         0
                     </span>
@@ -124,6 +107,7 @@
             </div>
 
 
+            {{-- COMPLETED --}}
             <div class="bg-[#0c0c0f] p-5">
 
                 <p class="text-xs text-zinc-500">
@@ -134,14 +118,14 @@
 
                     <span
                         id="completed-tasks"
-                        class="text-2xl font-semibold"
+                        class="text-2xl font-semibold text-white"
                     >
                         0
                     </span>
 
                     <span
                         id="completion-percentage"
-                        class="pb-0.5 text-xs text-emerald-400"
+                        class="pb-0.5 text-xs font-medium text-emerald-400"
                     >
                         0%
                     </span>
@@ -151,30 +135,7 @@
             </div>
 
 
-            <div class="bg-[#0c0c0f] p-5">
-
-                <p class="text-xs text-zinc-500">
-                    Current streak
-                </p>
-
-                <div class="mt-3 flex items-end gap-2">
-
-                    <span
-                        id="current-streak"
-                        class="text-2xl font-semibold"
-                    >
-                        7
-                    </span>
-
-                    <span class="pb-0.5 text-xs text-orange-400">
-                        🔥 days
-                    </span>
-
-                </div>
-
-            </div>
-
-
+            {{-- EXPERIENCE --}}
             <div class="bg-[#0c0c0f] p-5">
 
                 <p class="text-xs text-zinc-500">
@@ -185,7 +146,7 @@
 
                     <span
                         id="total-exp"
-                        class="text-2xl font-semibold"
+                        class="text-2xl font-semibold text-white"
                     >
                         0
                     </span>
@@ -199,6 +160,7 @@
             </div>
 
         </div>
+
 
 
         {{-- CONTENT --}}
@@ -242,20 +204,6 @@
                 >
                 </div>
 
-
-                {{-- TASK FOOTER --}}
-                <div class="border-t border-zinc-800 px-5 py-4">
-
-                    <button
-                        id="add-task-footer"
-                        type="button"
-                        class="text-xs font-medium text-zinc-500 transition hover:text-white"
-                    >
-                        + Add another task
-                    </button>
-
-                </div>
-
             </section>
 
 
@@ -281,27 +229,23 @@
 
                     <div class="mt-6 flex items-center gap-5">
 
-                        <div class="relative flex h-24 w-24 shrink-0 items-center justify-center rounded-full border-[7px] border-zinc-800">
+                        <div
+                            id="productivity-circle"
+                            class="productivity-circle relative flex h-24 w-24 shrink-0 items-center justify-center rounded-full"
+                            style="--progress: 0%;"
+                        >
+                            <div class="absolute inset-[7px] flex items-center justify-center rounded-full bg-[#0c0c0f]">
+                                <div class="text-center">
+                                    <p id="sidebar-percentage" class="text-xl font-semibold text-white">
+                                        0%
+                                    </p>
 
-                            <div class="absolute inset-[-7px] rotate-[-35deg] rounded-full border-[7px] border-violet-500 border-b-transparent border-l-transparent"></div>
-
-                            <div class="text-center">
-
-                                <p
-                                    id="sidebar-percentage"
-                                    class="text-xl font-semibold"
-                                >
-                                    0%
-                                </p>
-
-                                <p class="text-[9px] text-zinc-600">
-                                    score
-                                </p>
-
+                                    <p class="text-[9px] text-zinc-600">
+                                        score
+                                    </p>
+                                </div>
                             </div>
-
                         </div>
-
 
                         <div class="flex-1">
 
@@ -383,165 +327,7 @@
 
                 </div>
 
-
-                {{-- FOCUS MODE --}}
-                <div class="rounded-xl border border-violet-500/20 bg-violet-500/[0.04] p-5">
-
-                    <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-violet-500/10 text-sm">
-                        🎯
-                    </div>
-
-                    <h3 class="mt-4 text-sm font-semibold">
-                        Focus mode
-                    </h3>
-
-                    <p class="mt-2 text-xs leading-5 text-zinc-500">
-                        Work on one task without distractions.
-                    </p>
-
-                    <button
-                        type="button"
-                        class="mt-4 w-full rounded-lg bg-violet-500 py-2.5 text-xs font-semibold text-white transition hover:bg-violet-400"
-                    >
-                        Start focus session
-                    </button>
-
-                </div>
-
             </aside>
-
-        </div>
-
-
-        {{-- BOTTOM --}}
-        <div class="mt-6 grid gap-6 lg:grid-cols-2">
-
-
-            {{-- ACHIEVEMENTS --}}
-            <section class="rounded-xl border border-zinc-800 bg-[#0c0c0f] p-5">
-
-                <div class="flex items-center justify-between">
-
-                    <div>
-
-                        <h3 class="text-sm font-semibold">
-                            Achievements
-                        </h3>
-
-                        <p class="mt-1 text-xs text-zinc-600">
-                            Keep going to unlock more.
-                        </p>
-
-                    </div>
-
-                    <span class="text-lg">
-                        🏆
-                    </span>
-
-                </div>
-
-
-                <div class="mt-5 grid grid-cols-3 gap-3">
-
-                    <div class="rounded-lg border border-zinc-800 bg-zinc-900/50 p-4 text-center">
-
-                        <div class="text-xl">
-                            🔥
-                        </div>
-
-                        <p class="mt-2 text-[10px] font-medium text-zinc-400">
-                            7 Day Streak
-                        </p>
-
-                    </div>
-
-
-                    <div class="rounded-lg border border-zinc-800 bg-zinc-900/50 p-4 text-center">
-
-                        <div class="text-xl">
-                            ⚡
-                        </div>
-
-                        <p class="mt-2 text-[10px] font-medium text-zinc-400">
-                            Fast Starter
-                        </p>
-
-                    </div>
-
-
-                    <div class="rounded-lg border border-zinc-800 bg-zinc-900/50 p-4 text-center">
-
-                        <div class="text-xl">
-                            🎯
-                        </div>
-
-                        <p class="mt-2 text-[10px] font-medium text-zinc-400">
-                            Focused
-                        </p>
-
-                    </div>
-
-                </div>
-
-            </section>
-
-
-            {{-- WEEKLY ACTIVITY --}}
-            <section class="rounded-xl border border-zinc-800 bg-[#0c0c0f] p-5">
-
-                <div>
-
-                    <h3 class="text-sm font-semibold">
-                        Weekly activity
-                    </h3>
-
-                    <p class="mt-1 text-xs text-zinc-600">
-                        Completed tasks over the last 7 days.
-                    </p>
-
-                </div>
-
-
-                <div class="mt-6 flex h-28 items-end gap-2">
-
-                    <div class="flex h-full flex-1 flex-col justify-end gap-2">
-                        <div class="h-[30%] rounded-sm bg-zinc-800"></div>
-                        <span class="text-center text-[9px] text-zinc-700">M</span>
-                    </div>
-
-                    <div class="flex h-full flex-1 flex-col justify-end gap-2">
-                        <div class="h-[50%] rounded-sm bg-zinc-700"></div>
-                        <span class="text-center text-[9px] text-zinc-700">T</span>
-                    </div>
-
-                    <div class="flex h-full flex-1 flex-col justify-end gap-2">
-                        <div class="h-[70%] rounded-sm bg-violet-500/60"></div>
-                        <span class="text-center text-[9px] text-zinc-700">W</span>
-                    </div>
-
-                    <div class="flex h-full flex-1 flex-col justify-end gap-2">
-                        <div class="h-[45%] rounded-sm bg-zinc-700"></div>
-                        <span class="text-center text-[9px] text-zinc-700">T</span>
-                    </div>
-
-                    <div class="flex h-full flex-1 flex-col justify-end gap-2">
-                        <div class="h-[90%] rounded-sm bg-violet-500"></div>
-                        <span class="text-center text-[9px] text-zinc-700">F</span>
-                    </div>
-
-                    <div class="flex h-full flex-1 flex-col justify-end gap-2">
-                        <div class="h-[60%] rounded-sm bg-zinc-700"></div>
-                        <span class="text-center text-[9px] text-zinc-700">S</span>
-                    </div>
-
-                    <div class="flex h-full flex-1 flex-col justify-end gap-2">
-                        <div class="h-[25%] rounded-sm bg-zinc-800"></div>
-                        <span class="text-center text-[9px] text-zinc-700">S</span>
-                    </div>
-
-                </div>
-
-            </section>
 
         </div>
 
@@ -553,8 +339,9 @@
 
         <div class="border-t border-zinc-900 pt-6 text-center">
 
-            <p class="text-[11px] text-zinc-700">
-                Momentum · Stay focused. Get things done.
+            <p class="text-[11px] text-zinc-1000">
+                Momentum · Make a list, Conquer your day!
+
             </p>
 
         </div>
@@ -753,7 +540,6 @@
     </div>
 
 </div>
-```
 
 </body>
 </html>

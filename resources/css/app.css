@@ -7,3 +7,18 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+.productivity-circle {
+    background: conic-gradient(
+        #8b5cf6 var(--progress),
+        #27272a var(--progress)
+    );
+
+    transition: --progress 700ms ease-in-out;
+}
+
+@property --progress {
+    syntax: '<percentage>';
+    inherits: false;
+    initial-value: 0%;
+}

@@ -609,17 +609,17 @@ fetch('/tasks', {
         const taskRow = event.target.closest('.group');
 
 
-        // 1. COMPLETE TASK
+        // 1. complete task
         if (completeButton) {
             const id = Number(completeButton.dataset.id);
             const task = tasks.find(task => task.id === id);
 
             if (task) {
-                // Instantly update the UI for a snappy feel
+                // crispy nyan pre
                 task.completed = !task.completed;
                 renderTasks(); 
 
-                // Send the update to the database
+                // update to sa db 
                 fetch(`/tasks/${id}/complete`, {
                     method: 'POST',
                     headers: {
@@ -697,6 +697,14 @@ fetch('/tasks', {
                 
                 viewCategory.textContent = task.category || 'None';
                 viewDueDate.textContent = task.due_date ? task.due_date.split('T')[0] : 'No due date';
+
+
+                //comments to brah
+                const activeCommentTaskId = document.getElementById('active-comment-task-id');
+                if (activeCommentTaskId) activeCommentTaskId.value = task.id;
+                loadComments(task.id);
+
+
 
                 viewTaskModal.classList.remove('hidden');
             }
@@ -798,6 +806,95 @@ fetch('/tasks', {
         });
 
     }
+
+
+    // ==========================================
+    // COMMENTS LOGIC
+    // ==========================================
+
+    function loadComments(taskId) {
+        const commentsList = document.getElementById('modal-comments-list');
+        if (!commentsList) return;
+        
+        commentsList.innerHTML = '<p class="text-xs text-zinc-600">Loading comments...</p>';
+
+        fetch(`/tasks/${taskId}/comments`, { 
+            headers: { 'Accept': 'application/json' } 
+        })
+        .then(res => res.json())
+        .then(comments => {
+            commentsList.innerHTML = '';
+            if (comments.length === 0) {
+                commentsList.innerHTML = '<p class="text-xs text-zinc-600 italic">No comments yet.</p>';
+                return;
+            }
+
+            comments.forEach(comment => {
+                const div = document.createElement('div');
+                div.className = 'flex items-center justify-between rounded-lg bg-zinc-900/60 border border-zinc-800/60 px-3 py-2 text-xs';
+                div.innerHTML = `
+                    <span class="text-zinc-300">${escapeHtml(comment.body)}</span>
+                    <button class="delete-comment text-zinc-600 hover:text-red-400 ml-2 cursor-pointer" data-id="${comment.id}">×</button>
+                `;
+                commentsList.appendChild(div);
+            });
+        })
+        .catch(err => {
+            console.error('Error loading comments:', err);
+            commentsList.innerHTML = '<p class="text-xs text-red-400">Failed to load comments.</p>';
+        });
+    }
+
+    // Handle Comment Submission
+    const commentForm = document.getElementById('comment-form');
+    if (commentForm) {
+        commentForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const taskId = document.getElementById('active-comment-task-id').value;
+            const input = document.getElementById('comment-input');
+            const body = input.value.trim();
+            if (!body || !taskId) return;
+
+            const res = await fetch(`/tasks/${taskId}/comments`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify({ body })
+            });
+
+            if (res.ok) {
+                input.value = '';
+                loadComments(taskId);
+            }
+        });
+    }
+
+    // Handle Comment Deletion
+    const commentsListContainer = document.getElementById('modal-comments-list');
+    if (commentsListContainer) {
+        commentsListContainer.addEventListener('click', async (e) => {
+            if (e.target.classList.contains('delete-comment')) {
+                const commentId = e.target.dataset.id;
+                const taskId = document.getElementById('active-comment-task-id').value;
+
+                const res = await fetch(`/comments/${commentId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    }
+                });
+
+                if (res.ok) {
+                    loadComments(taskId);
+                }
+            }
+        });
+    }
+
 
 
     // ==========================================

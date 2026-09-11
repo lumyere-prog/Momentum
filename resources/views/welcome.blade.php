@@ -560,6 +560,34 @@
 
     </div>
 
+    {{-- COMMENTS SECTION --}}
+<div class="mt-6 border-t border-zinc-800 pt-4">
+    <h4 class="text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-3">Activity & Comments</h4>
+    
+    {{-- Comment List --}}
+    <div id="modal-comments-list" class="space-y-3 max-h-40 overflow-y-auto mb-3 pr-1">
+        {{-- JS will render comments here --}}
+    </div>
+
+    {{-- Add Comment Form --}}
+    <form id="comment-form" class="flex gap-2">
+        <input type="hidden" id="active-comment-task-id">
+        <input 
+            type="text" 
+            id="comment-input" 
+            placeholder="Write a quick note or comment..." 
+            required
+            class="flex-1 rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-xs text-zinc-200 focus:border-violet-500 focus:outline-none"
+        >
+        <button 
+            type="submit" 
+            class="rounded-lg bg-violet-600 px-3 py-2 text-xs font-medium text-white transition hover:bg-violet-500 cursor-pointer"
+        >
+            Post
+        </button>
+    </form>
+</div>
+
 </div>
 
 

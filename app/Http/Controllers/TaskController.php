@@ -17,18 +17,20 @@ class TaskController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title'    => 'required|string|max:255',
-            'priority' => 'required|string|in:Low,Medium,High',
-            'category' => 'nullable|string|max:100',
-            'due_date' => 'required|date|after_or_equal:today', 
+            'title'       => 'required|string|max:255',
+            'description' => 'nullable|string|max:255',
+            'priority'    => 'required|string|in:Low,Medium,High',
+            'category'    => 'nullable|string|max:100',
+            'due_date'    => 'required|date', 
         ]);
 
         $task = Task::create([
-            'title'     => $validated['title'],
-            'priority'  => $validated['priority'],
-            'category'  => $validated['category'],
-            'due_date'  => $validated['due_date'],
-            'completed' => false,
+            'title'       => $validated['title'],
+            'description' => $validated['description'], // <-- Add this line!
+            'priority'    => $validated['priority'],
+            'category'    => $validated['category'],
+            'due_date'    => $validated['due_date'],
+            'completed'   => false,
         ]);
 
         return response()->json([
@@ -46,6 +48,15 @@ class TaskController extends Controller
         return response()->json([
             'message' => 'Task completion updated!',
             'task' => $task
+        ]);
+    }
+    // Delete the task from the database
+    public function destroy(Task $task)
+    {
+        $task->delete();
+
+        return response()->json([
+            'message' => 'Task deleted successfully!'
         ]);
     }
 }

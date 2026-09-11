@@ -1,13 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-
-    // ==========================================
-    // TASK DATA
-    // ==========================================
-
-   // Remove this line:
-// let tasks = JSON.parse(localStorage.getItem('taskflow_tasks')) || [];
-
-// Replace it with this:
 let tasks = [];
 
 // Fetch real tasks from the database when the page loads
@@ -18,11 +9,20 @@ fetch('/tasks', {
 })
 .then(response => response.json())
 .then(data => {
-    tasks = data;
+    // Check if data is wrapped in an object (like { tasks: [...] } or pagination { data: [...] })
+    if (Array.isArray(data)) {
+        tasks = data;
+    } else if (data.tasks && Array.isArray(data.tasks)) {
+        tasks = data.tasks;
+    } else if (data.data && Array.isArray(data.data)) {
+        tasks = data.data;
+    } else {
+        tasks = [];
+    }
+    
     renderTasks();
 })
 .catch(error => console.error('Error loading tasks:', error));
-
 
     // ==========================================
     // ELEMENTS
@@ -46,6 +46,17 @@ fetch('/tasks', {
     const closeDebtModal = document.getElementById('close-debt-modal');
     const closeDebtButton = document.getElementById('close-debt');
     const debtTaskList = document.getElementById('debt-task-list');
+
+    // View Task Modal Elements
+    const viewTaskModal = document.getElementById('view-task-modal');
+    const closeViewModalBtn = document.getElementById('close-view-modal');
+    const closeViewModalAction = document.getElementById('close-view-modal-btn');
+    
+    const viewTitle = document.getElementById('view-task-title');
+    const viewDescription = document.getElementById('view-task-description');
+    const viewPriority = document.getElementById('view-task-priority');
+    const viewCategory = document.getElementById('view-task-category');
+    const viewDueDate = document.getElementById('view-task-due-date');
 
 
     // ==========================================
@@ -170,6 +181,30 @@ fetch('/tasks', {
 
         return div.innerHTML;
 
+    }
+
+
+    // Close View Modal Logic
+    function closeViewModal() {
+        if (viewTaskModal) {
+            viewTaskModal.classList.add('hidden');
+        }
+    }
+
+    if (closeViewModalBtn) {
+        closeViewModalBtn.addEventListener('click', closeViewModal);
+    }
+
+    if (closeViewModalAction) {
+        closeViewModalAction.addEventListener('click', closeViewModal);
+    }
+
+    if (viewTaskModal) {
+        viewTaskModal.addEventListener('click', (event) => {
+            if (event.target === viewTaskModal) {
+                closeViewModal();
+            }
+        });
     }
 
 
@@ -404,15 +439,15 @@ fetch('/tasks', {
 
         // Render every task
 
-        tasks.forEach(task => {
+       tasks.forEach(task => {
 
             const taskElement =
                 document.createElement('div');
 
 
             taskElement.className =
-                'group flex items-center gap-4 border-b border-zinc-800/70 px-5 py-4 transition hover:bg-zinc-900/50';
-
+                'group flex items-center gap-4 border-b border-zinc-800/70 px-5 py-4 transition hover:bg-zinc-900/50 cursor-pointer';
+            taskElement.dataset.id = task.id; // <-- Add this line so the row knows its ID!
 
             taskElement.innerHTML = `
 
@@ -505,13 +540,7 @@ fetch('/tasks', {
         updateTaskDebt();
 
     }
-
-
-    // ==========================================
-    // CREATE TASK
-    // ==========================================
-
-    // ==========================================
+// ==========================================
     // CREATE TASK (SAVING TO LARAVEL DB)
     // ==========================================
 
@@ -520,6 +549,7 @@ fetch('/tasks', {
 
         // 1. Gather the data from the modal
         const titleInput = document.getElementById('task-title');
+        const descriptionInput = document.getElementById('task-description');
         const priorityInput = document.getElementById('task-priority');
         const categoryInput = document.getElementById('task-category');
         const dueDateInput = document.getElementById('task-due-date');
@@ -538,6 +568,7 @@ fetch('/tasks', {
                 },
                 body: JSON.stringify({
                     title: titleInput.value.trim(),
+                    description: descriptionInput ? descriptionInput.value.trim() : '',
                     priority: priorityInput.value,
                     category: categoryInput.value.trim(),
                     due_date: dueDateInput.value
@@ -554,9 +585,8 @@ fetch('/tasks', {
 
                 // Reset and close the modal
                 taskForm.reset();
-                taskModal.classList.add('hidden');
+                closeTaskModal();
             } else {
-                // Handle validation errors (like picking a past date)
                 const errorData = await response.json();
                 console.error("Validation Failed:", errorData.errors);
                 alert("Failed to save task. Please check your inputs.");
@@ -565,52 +595,33 @@ fetch('/tasks', {
         } catch (error) {
             console.error("Network Error:", error);
         }
-
-        tasks.unshift(newTask);
-
-
-        saveTasks();
-
-        renderTasks();
-
-
-        taskForm.reset();
-
-        closeTaskModal();
-
     });
 
 
-    // ==========================================
-    // COMPLETE / DELETE TASK
+// ==========================================
+    // COMPLETE / DELETE TASK / VIEW DETAILS
     // ==========================================
 
     taskList.addEventListener('click', (event) => {
 
-        const completeButton =
-            event.target.closest('.complete-task');
-
-        const deleteButton =
-            event.target.closest('.delete-task');
+        const completeButton = event.target.closest('.complete-task');
+        const deleteButton = event.target.closest('.delete-task');
+        const taskRow = event.target.closest('.group');
 
 
-        // Complete
-
-       // COMPLETE
+        // 1. COMPLETE TASK
         if (completeButton) {
             const id = Number(completeButton.dataset.id);
             const task = tasks.find(task => task.id === id);
 
             if (task) {
-                // 1. Instantly update the UI for a snappy user experience
+                // Instantly update the UI for a snappy feel
                 task.completed = !task.completed;
                 renderTasks(); 
 
-                // 2. Send the update to the database
-                // 2. Send the update to the database
-               // 2. Send the update to the database
-                fetch(`/tasks/${id}/complete`, { // <-- Updated URL
-                    method: 'POST',              // <-- Changed to POST
+                // Send the update to the database
+                fetch(`/tasks/${id}/complete`, {
+                    method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json',
@@ -619,42 +630,76 @@ fetch('/tasks', {
                 })
                 .then(async response => {
                     if (!response.ok) {
-                        // This intercepts the Laravel error and prints it for us!
                         const errorDetails = await response.json().catch(() => response.text());
                         console.error("Laravel Error Details:", errorDetails);
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
                     return response.json();
                 })
-                .then(data => {
-                    console.log('Successfully updated:', data);
-                })
                 .catch(error => {
                     console.error('Failed to sync to database:', error);
-                    // Revert the UI if the database failed
+                    // Revert the UI if it failed
                     task.completed = !task.completed;
                     renderTasks();
                 });
             }
+            return;
         }
 
 
-        // Delete
-
+        // 2. DELETE TASK (SYNCED WITH DB)
         if (deleteButton) {
-
-            const id =
-                Number(deleteButton.dataset.id);
-
-
-            tasks =
-                tasks.filter(task => task.id !== id);
-
-
-            saveTasks();
-
+            const id = Number(deleteButton.dataset.id);
+            
+            // Optimistically remove from local array and re-render
+            const previousTasks = [...tasks];
+            tasks = tasks.filter(task => task.id !== id);
             renderTasks();
 
+            // Send DELETE request to Laravel backend
+            fetch(`/tasks/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            })
+            .then(async response => {
+                if (!response.ok) {
+                    const errorDetails = await response.json().catch(() => response.text());
+                    console.error("Laravel Error Details:", errorDetails);
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .catch(error => {
+                console.error('Failed to delete from database:', error);
+                // Revert tasks array if database delete failed
+                tasks = previousTasks;
+                renderTasks();
+            });
+            return;
+        }
+
+
+        // 3. OPEN TASK DETAILS MODAL (ROW CLICK)
+        if (taskRow) {
+            const id = Number(taskRow.dataset.id);
+            const task = tasks.find(t => t.id === id);
+
+            if (task) {
+                viewTitle.textContent = task.title;
+                viewDescription.textContent = task.description || 'No description provided.';
+                
+                viewPriority.textContent = task.priority;
+                viewPriority.className = `inline-block rounded-md px-2 py-0.5 text-xs font-medium ${getPriorityClass(task.priority)}`;
+                
+                viewCategory.textContent = task.category || 'None';
+                viewDueDate.textContent = task.due_date ? task.due_date.split('T')[0] : 'No due date';
+
+                viewTaskModal.classList.remove('hidden');
+            }
         }
 
     });

@@ -392,6 +392,12 @@
 
             </div>
 
+            {{-- TASK DESCRIPTION --}}
+            <div>
+                <label for="task-description" class="mb-1.5 block text-xs text-zinc-400">Description</label>
+                <textarea id="task-description" rows="3" class="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-white focus:border-violet-500 focus:outline-none resize-none" placeholder="Add more details about this task..."></textarea>
+            </div>
+
 
             {{-- DUE DATE --}}
             <div>
@@ -479,6 +485,82 @@
         >
             Close
         </button>
+
+    </div>
+
+</div>
+
+{{-- ==========================================
+     VIEW TASK DETAILS MODAL
+     ========================================== --}}
+
+<div
+    id="view-task-modal"
+    class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/50 px-4 backdrop-blur-sm"
+>
+
+    <div class="w-full max-w-lg rounded-xl border border-zinc-800 bg-[#0c0c0f] p-5 shadow-xl sm:p-6">
+
+        <div class="mb-4 flex items-center justify-between gap-4 border-b border-zinc-800 pb-3">
+
+            <h3 id="view-task-title" class="text-base font-semibold text-white">
+                Task Title
+            </h3>
+
+            <button
+                id="close-view-modal"
+                type="button"
+                class="shrink-0 text-zinc-500 transition hover:text-white text-lg"
+            >
+                &times;
+            </button>
+
+        </div>
+
+
+        <div class="space-y-4 text-sm text-zinc-300">
+
+            {{-- DESCRIPTION --}}
+            <div>
+                <span class="text-xs text-zinc-500 block mb-1">Description</span>
+                <p id="view-task-description" class="rounded-lg bg-zinc-900 border border-zinc-800 p-3 text-zinc-200 min-h-[60px] whitespace-pre-wrap"></p>
+            </div>
+
+
+            {{-- META GRID --}}
+            <div class="grid grid-cols-2 gap-4">
+
+                <div>
+                    <span class="text-xs text-zinc-500 block mb-1">Priority</span>
+                    <span id="view-task-priority" class="inline-block rounded-md px-2 py-0.5 text-xs font-medium"></span>
+                </div>
+
+                <div>
+                    <span class="text-xs text-zinc-500 block mb-1">Category</span>
+                    <span id="view-task-category" class="text-xs text-zinc-300">None</span>
+                </div>
+
+            </div>
+
+
+            {{-- DUE DATE --}}
+            <div>
+                <span class="text-xs text-zinc-500 block mb-1">Due Date</span>
+                <span id="view-task-due-date" class="text-xs text-zinc-300"></span>
+            </div>
+
+        </div>
+
+
+        <div class="mt-6 flex justify-end">
+            <button
+                id="close-view-modal-btn"
+                type="button"
+                class="rounded-lg border border-zinc-800 px-4 py-2 text-xs font-medium text-zinc-400 transition hover:bg-zinc-900 hover:text-white"
+            >
+                Close
+            </button>
+        </div>
 
     </div>
 

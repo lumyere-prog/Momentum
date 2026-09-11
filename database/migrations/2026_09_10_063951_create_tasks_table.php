@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('title'); // For "Task Title"
             $table->string('priority')->default('Medium'); // For "Priority" dropdown
             $table->string('category')->nullable(); // For "Category"
+            $table->text('description')->nullable(); // For "Description"
             $table->date('due_date'); // For "Due Date"
             $table->boolean('completed')->default(false); // Background tracker
             $table->timestamps();

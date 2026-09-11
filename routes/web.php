@@ -15,3 +15,8 @@ Route::post('/tasks/{task}/complete', [TaskController::class, 'toggleComplete'])
 
 // Add this line for deletion:
 Route::delete('/tasks/{task}', [TaskController::class, 'destroy']);
+
+// Add these comment routes:
+Route::get('/tasks/{task}/comments', [TaskController::class, 'comments']);
+Route::post('/tasks/{task}/comments', [TaskController::class, 'storeComment']);
+Route::delete('/comments/{comment}', [TaskController::class, 'destroyComment']);

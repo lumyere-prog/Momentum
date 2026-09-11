@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Task;
+use App\Models\Comment;
 use Illuminate\Http\Request;
 
 class TaskController extends Controller
@@ -26,7 +27,7 @@ class TaskController extends Controller
 
         $task = Task::create([
             'title'       => $validated['title'],
-            'description' => $validated['description'], // <-- Add this line!
+            'description' => $validated['description'],
             'priority'    => $validated['priority'],
             'category'    => $validated['category'],
             'due_date'    => $validated['due_date'],
@@ -38,10 +39,9 @@ class TaskController extends Controller
             'task'    => $task
         ], 201);
     }
-    // Add this inside TaskController
+
     public function toggleComplete(Task $task)
     {
-        // Flip the current status (true becomes false, false becomes true)
         $task->completed = !$task->completed;
         $task->save();
 
@@ -50,6 +50,7 @@ class TaskController extends Controller
             'task' => $task
         ]);
     }
+
     // Delete the task from the database
     public function destroy(Task $task)
     {
@@ -57,6 +58,43 @@ class TaskController extends Controller
 
         return response()->json([
             'message' => 'Task deleted successfully!'
+        ]);
+    }
+
+    // ==========================================
+    // COMMENTS METHODS
+    // ==========================================
+
+    // Fetch comments for a specific task
+    public function comments(Task $task)
+    {
+        return response()->json($task->comments()->latest()->get());
+    }
+
+    // Store a new comment
+    public function storeComment(Request $request, Task $task)
+    {
+        $validated = $request->validate([
+            'body' => 'required|string|max:1000',
+        ]);
+
+        $comment = $task->comments()->create([
+            'body' => $validated['body'],
+        ]);
+
+        return response()->json([
+            'message' => 'Comment added!',
+            'comment' => $comment
+        ], 201);
+    }
+
+    // Delete a comment
+    public function destroyComment(Comment $comment)
+    {
+        $comment->delete();
+
+        return response()->json([
+            'message' => 'Comment deleted!'
         ]);
     }
 }

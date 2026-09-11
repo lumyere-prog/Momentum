@@ -22,4 +22,8 @@ class Task extends Model
         'due_date' => 'date',
         'completed' => 'boolean',
     ];
+    public function comments()
+{
+    return $this->hasMany(Comment::class)->latest();
+}
 }

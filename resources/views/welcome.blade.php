@@ -24,7 +24,7 @@
 
                     <div class="flex h-14 w-14 shrink-0 sm:h-16 sm:w-16 md:h-20 md:w-20">
                         <img
-                            src="{{ asset('images/logo.png') }}"
+                            src="{{ asset('images/logo2.png') }}"
                             alt="Logo"
                             class="h-full w-full object-contain"
                         >
@@ -39,7 +39,7 @@
                 </div>
 
                 <div class="w-full sm:w-auto">
-                    <p class="text-[10px] font-medium uppercase tracking-[0.15em] text-zinc-900 sm:text-xs sm:tracking-[0.2em]">
+                    <p class="text-[10px] font-medium uppercase tracking-[0.15em] text-zinc-900 sm:text-xs sm:tracking-[0.2em] bg-blue-400 px-2 py-2 rounded-lg text-center">
                         {{ now()->format('l, F j') }}
                     </p>
                 </div>
@@ -73,7 +73,7 @@
             {{-- TODAY'S TASKS --}}
             <div class="min-w-0 bg-[#0c0c0f] p-4 sm:p-5">
 
-                <p class="text-xs text-zinc-500">
+                <p class="text-xs text-zinc-100">
                     Today's tasks
                 </p>
 
@@ -86,7 +86,7 @@
                         0
                     </span>
 
-                    <span class="pb-0.5 text-xs text-zinc-600">
+                    <span class="pb-0.5 text-xs text-zinc-100">
                         tasks
                     </span>
 
@@ -98,7 +98,7 @@
             {{-- COMPLETED --}}
             <div class="min-w-0 bg-[#0c0c0f] p-4 sm:p-5">
 
-                <p class="text-xs text-zinc-500">
+                <p class="text-xs text-zinc-100">
                     Completed
                 </p>
 
@@ -113,7 +113,7 @@
 
                     <span
                         id="completion-percentage"
-                        class="pb-0.5 text-xs font-medium text-emerald-400"
+                        class="pb-0.5 text-xs font-medium text-blue-400"
                     >
                         0%
                     </span>
@@ -131,7 +131,7 @@
                             Productivity
                         </h3>
 
-                        <span class="text-[11px] text-zinc-600">
+                        <span class="text-[11px] text-zinc-100">
                             This week
                         </span>
 
@@ -155,7 +155,7 @@
                                         0%
                                     </p>
 
-                                    <p class="text-[9px] text-zinc-600">
+                                    <p class="text-[9px] text-zinc-100">
                                         score
                                     </p>
 
@@ -168,7 +168,7 @@
 
                             <div class="mb-3 flex items-center justify-between gap-2">
 
-                                <span class="text-xs text-zinc-500">
+                                <span class="text-xs text-zinc-100">
                                     Completed
                                 </span>
 
@@ -185,12 +185,12 @@
 
                                 <div
                                     id="progress-bar"
-                                    class="h-full w-0 rounded-full bg-violet-500 transition-all duration-300"
+                                    class="h-full w-0 rounded-full bg-blue-500 transition-all duration-300"
                                 ></div>
 
                             </div>
 
-                            <p class="mt-3 text-[11px] leading-4 text-zinc-600">
+                            <p class="mt-3 text-[11px] leading-4 text-zinc-100">
                                 Keep completing tasks to improve your score.
                             </p>
 
@@ -208,7 +208,7 @@
 
                         <div>
 
-                            <p class="text-xs font-medium uppercase tracking-wider text-zinc-600">
+                            <p class="text-xs font-medium uppercase tracking-wider text-zinc-100">
                                 Task debt
                             </p>
 
@@ -221,15 +221,11 @@
 
                         </div>
 
-                        <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-red-400/10 text-sm">
-                            💀
-                        </div>
-
                     </div>
 
                     <p
                         id="task-debt-message"
-                        class="mt-4 text-xs leading-5 text-zinc-500"
+                        class="mt-4 text-xs leading-5 text-zinc-100"
                     >
                         You're all caught up. Keep the momentum going.
                     </p>
@@ -260,11 +256,11 @@
 
                     <div class="min-w-0">
 
-                        <h3 class="text-sm font-semibold text-white">
+                        <h3 class="text-sm font-semibold text-zinc-100">
                             Today's tasks
                         </h3>
 
-                        <p class="mt-1 text-xs text-zinc-600">
+                        <p class="mt-1 text-xs text-zinc-100">
                             <span id="remaining-tasks">0</span>
                             tasks remaining
                         </p>

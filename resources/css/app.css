@@ -10,7 +10,7 @@
 
 .productivity-circle {
     background: conic-gradient(
-        #8b5cf6 var(--progress),
+        #007efc var(--progress),
         #27272a var(--progress)
     );
 

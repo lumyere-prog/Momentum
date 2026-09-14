@@ -58,13 +58,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const viewCategory = document.getElementById('view-task-category');
     const viewDueDate = document.getElementById('view-task-due-date');
 
-    // Comments Modal Elements
-    const commentsModal = document.getElementById('comments-modal');
-    const openCommentsModalBtn = document.getElementById('open-comments-modal');
-    const closeCommentsModalBtn = document.getElementById('close-comments-modal');
-    const closeCommentsBtn = document.getElementById('close-comments-btn');
-    const commentsTaskTitle = document.getElementById('comments-task-title');
-
     // Theme Toggle Elements
     const themeToggle = document.getElementById('theme-toggle');
     const themeIconSun = document.getElementById('theme-icon-sun');
@@ -211,67 +204,6 @@ document.addEventListener('DOMContentLoaded', () => {
         viewTaskModal.addEventListener('click', (event) => {
             if (event.target === viewTaskModal) {
                 closeViewModal();
-            }
-        });
-    }
-
-
-    // ==========================================
-    // COMMENTS MODAL OPEN / CLOSE
-    // ==========================================
-
-    function openCommentsModal(taskId = null, taskTitle = 'All activity') {
-        if (taskId) {
-            const activeCommentTaskId = document.getElementById('active-comment-task-id');
-            if (activeCommentTaskId) activeCommentTaskId.value = taskId;
-
-            // Load that task's comments
-            loadComments(taskId);
-        } else {
-            // Clear the task id and show a placeholder / all comments
-            const activeCommentTaskId = document.getElementById('active-comment-task-id');
-            if (activeCommentTaskId) activeCommentTaskId.value = '';
-
-            const commentsList = document.getElementById('modal-comments-list');
-            if (commentsList) {
-                commentsList.innerHTML =
-                    '<p class="text-xs text-zinc-600 italic dark:text-zinc-400">Select a task to view its comments.</p>';
-            }
-        }
-
-        if (commentsTaskTitle) {
-            commentsTaskTitle.textContent = taskTitle || '—';
-        }
-
-        if (commentsModal) {
-            commentsModal.classList.remove('hidden');
-            commentsModal.classList.add('flex');
-        }
-    }
-
-    function closeCommentsModal() {
-        if (commentsModal) {
-            commentsModal.classList.add('hidden');
-            commentsModal.classList.remove('flex');
-        }
-    }
-
-    if (openCommentsModalBtn) {
-        openCommentsModalBtn.addEventListener('click', () => openCommentsModal());
-    }
-
-    if (closeCommentsModalBtn) {
-        closeCommentsModalBtn.addEventListener('click', closeCommentsModal);
-    }
-
-    if (closeCommentsBtn) {
-        closeCommentsBtn.addEventListener('click', closeCommentsModal);
-    }
-
-    if (commentsModal) {
-        commentsModal.addEventListener('click', (event) => {
-            if (event.target === commentsModal) {
-                closeCommentsModal();
             }
         });
     }
@@ -485,15 +417,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </div>
 
-                <!-- COMMENTS BUTTON (per task) -->
-                <button
-                    class="task-comments shrink-0 rounded-md px-2 py-1 text-[11px] text-zinc-200 transition bg-blue-400 hover:bg-blue-800 hover:text-white shadow-sm shadow-blue-500 cursor-pointer"
-                    data-id="${task.id}"
-                    title="View comments"
-                >
-                    Add Comment
-                </button>
-
                 <!-- DELETE -->
                 <button
                     class="delete-task opacity-0 transition group-hover:opacity-100 text-zinc-500 hover:text-red-400 dark:text-zinc-400"
@@ -567,114 +490,69 @@ document.addEventListener('DOMContentLoaded', () => {
     // COMPLETE / DELETE TASK / VIEW DETAILS / COMMENTS
     // ==========================================
 
-    taskList.addEventListener('click', (event) => {
+   taskList.addEventListener('click', (event) => {
 
-        const completeButton = event.target.closest('.complete-task');
-        const deleteButton = event.target.closest('.delete-task');
-        const commentsButton = event.target.closest('.task-comments');
-        const taskRow = event.target.closest('.group');
+    const completeButton = event.target.closest('.complete-task');
+    const deleteButton = event.target.closest('.delete-task');
+    const taskRow = event.target.closest('.group');
 
-        // 1. complete task
-        if (completeButton) {
-            const id = Number(completeButton.dataset.id);
-            const task = tasks.find(task => task.id === id);
+    // 1. Complete task
+    if (completeButton) {
+        event.stopPropagation();
+        const id = Number(completeButton.dataset.id);
+        const task = tasks.find(t => Number(t.id) === id);
 
-            if (task) {
-                task.completed = !task.completed;
-                renderTasks();
-
-                fetch(`/tasks/${id}/complete`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    }
-                })
-                .then(async response => {
-                    if (!response.ok) {
-                        const errorDetails = await response.json().catch(() => response.text());
-                        console.error("Laravel Error Details:", errorDetails);
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .catch(error => {
-                    console.error('Failed to sync to database:', error);
-                    task.completed = !task.completed;
-                    renderTasks();
-                });
-            }
-            return;
-        }
-
-
-        // 2. DELETE TASK (SYNCED WITH DB)
-        if (deleteButton) {
-            const id = Number(deleteButton.dataset.id);
-
-            const previousTasks = [...tasks];
-            tasks = tasks.filter(task => task.id !== id);
+        if (task) {
+            task.completed = !task.completed;
             renderTasks();
 
-            fetch(`/tasks/${id}`, {
-                method: 'DELETE',
+            fetch(`/tasks/${id}/complete`, {
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                 }
             })
-            .then(async response => {
-                if (!response.ok) {
-                    const errorDetails = await response.json().catch(() => response.text());
-                    console.error("Laravel Error Details:", errorDetails);
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .catch(error => {
-                console.error('Failed to delete from database:', error);
-                tasks = previousTasks;
+            .then(res => { if (!res.ok) throw new Error(); return res.json(); })
+            .catch(() => {
+                task.completed = !task.completed;
                 renderTasks();
             });
-            return;
         }
+        return;
+    }
 
+    // 2. Delete task
+    if (deleteButton) {
+        event.stopPropagation();
+        const id = Number(deleteButton.dataset.id);
+        const previousTasks = [...tasks];
+        tasks = tasks.filter(t => Number(t.id) !== id);
+        renderTasks();
 
-        // 3. OPEN COMMENTS MODAL (💬 button)
-        if (commentsButton) {
-            const id = Number(commentsButton.dataset.id);
-            const task = tasks.find(t => t.id === id);
-
-            if (task) {
-                openCommentsModal(task.id, task.title);
+        fetch(`/tasks/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
             }
-            return;
-        }
+        })
+        .then(res => { if (!res.ok) throw new Error(); return res.json(); })
+        .catch(() => {
+            tasks = previousTasks;
+            renderTasks();
+        });
+        return;
+    }
 
-
-        // 4. OPEN TASK DETAILS MODAL (ROW CLICK)
-        if (taskRow) {
-            const id = Number(taskRow.dataset.id);
-            const task = tasks.find(t => t.id === id);
-
-            if (task) {
-                viewTitle.textContent = task.title;
-                viewDescription.textContent = task.description || 'No description provided.';
-
-                viewPriority.textContent = task.priority;
-                viewPriority.className = `inline-block rounded-md px-2 py-0.5 text-xs font-medium ${getPriorityClass(task.priority)}`;
-
-                viewCategory.textContent = task.category || 'None';
-                viewDueDate.textContent = task.due_date
-                    ? task.due_date.split('T')[0]
-                    : 'No due date';
-
-                viewTaskModal.classList.remove('hidden');
-            }
-        }
-    });
+    // 3. Click row → open task detail page (same tab)
+    if (taskRow) {
+        const id = taskRow.dataset.id;
+        window.location.href = `/comment?task=${id}`;
+    }
+});
 
 
     // ==========================================

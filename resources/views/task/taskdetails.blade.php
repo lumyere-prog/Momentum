@@ -17,7 +17,9 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-indigo-100 text-zinc-900 antialiased dark:from-zinc-950 dark:via-zinc-950 dark:to-zinc-900 dark:text-zinc-100">
+<body class="min-h-screen 
+
+bg-gradient-to-br from-blue-50 via-blue-100 to-indigo-100 text-zinc-900 antialiased dark:from-zinc-950 dark:via-zinc-950 dark:to-zinc-900 dark:text-zinc-100">
 
 <div class="min-h-screen">
 
@@ -49,11 +51,34 @@
         <div class="rounded-xl border border-blue-200/60 bg-white/90 p-6 shadow-md shadow-blue-500/10 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-900/80 dark:shadow-black/30">
 
             <div class="flex items-start justify-between gap-4 mb-5">
-                <h1 id="task-title" class="text-lg font-semibold text-zinc-900 dark:text-white">
-                    Loading...
-                </h1>
-                <span id="task-priority" class="shrink-0 rounded-md px-2 py-0.5 text-[10px] font-medium"></span>
-            </div>
+
+    <h1 id="task-title" class="text-lg font-semibold text-zinc-900 dark:text-white min-w-0">
+        Loading...
+    </h1>
+
+    <div class="flex shrink-0 items-center gap-2">
+
+        {{-- PRIORITY BADGE --}}
+        <span id="task-priority" class="rounded-md px-2 py-0.5 text-[10px] font-medium"></span>
+
+        {{-- 🆕 DONE BUTTON --}}
+        <button
+            id="toggle-complete"
+            type="button"
+            class="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition cursor-pointer
+                border-blue-200 bg-white/70 text-blue-700 hover:bg-blue-50 hover:text-blue-800
+                dark:border-zinc-700 dark:bg-zinc-800/70 dark:text-zinc-200 dark:hover:bg-zinc-700 dark:hover:text-white"
+            data-completed="0"
+        >
+            <svg id="done-icon" class="hidden h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+            <span id="done-label">Done</span>
+        </button>
+
+    </div>
+
+</div>
 
             <div class="mb-5">
                 <span class="text-xs font-medium text-zinc-500 block mb-1.5 dark:text-zinc-400">Description</span>
@@ -117,6 +142,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const taskDescription = document.getElementById('task-description');
     const taskCategory = document.getElementById('task-category');
     const taskDueDate = document.getElementById('task-due-date');
+    const toggleCompleteBtn = document.getElementById('toggle-complete');
+    const doneIcon = document.getElementById('done-icon');
+    const doneLabel = document.getElementById('done-label');
     const commentsList = document.getElementById('comments-list');
     const commentForm = document.getElementById('comment-form');
     const commentInput = document.getElementById('comment-input');
@@ -159,7 +187,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             taskTitle.textContent = task.title;
             taskDescription.textContent = task.description || 'No description provided.';
-
+            // Reflect current completed state on the Done button
+            if (toggleCompleteBtn && typeof applyCompleteStyle === 'function') {
+                const isDone = task.completed === true || task.completed === 1 || task.completed === '1';
+                toggleCompleteBtn.dataset.completed = isDone ? '1' : '0';
+                applyCompleteStyle(isDone);
+            }
             taskPriority.textContent = task.priority;
             taskPriority.className = `shrink-0 rounded-md px-2 py-0.5 text-[10px] font-medium ${getPriorityClass(task.priority)}`;
 
@@ -245,6 +278,67 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (res.ok) loadComments();
     });
+
+        // ==========================================
+    // DONE / UNDO BUTTON
+    // ==========================================
+
+    function applyCompleteStyle(isComplete) {
+    if (!toggleCompleteBtn || !doneIcon || !doneLabel) return;
+
+    if (isComplete) {
+        // RED = "Undo" state (no icon)
+        toggleCompleteBtn.className =
+            'inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition cursor-pointer ' +
+            'border-red-500 bg-red-500 text-white hover:bg-red-600 hover:border-red-600 ' +
+            'dark:border-red-400 dark:bg-red-400 dark:text-zinc-900 dark:hover:bg-red-300';
+        doneIcon.classList.add('hidden');   // ← always hidden
+        doneLabel.textContent = 'Undo';
+
+        // Line through the title
+        taskTitle.classList.add('line-through', 'text-zinc-400', 'dark:text-zinc-500');
+    } else {
+        // DEFAULT = "Done" state (blue outline)
+        toggleCompleteBtn.className =
+            'inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition cursor-pointer ' +
+            'border-blue-200 bg-white/70 text-blue-700 hover:bg-blue-50 hover:text-blue-800 ' +
+            'dark:border-zinc-700 dark:bg-zinc-800/70 dark:text-zinc-200 dark:hover:bg-zinc-700 dark:hover:text-white';
+        doneIcon.classList.add('hidden');   // ← always hidden
+        doneLabel.textContent = 'Done';
+
+        // Remove line through
+        taskTitle.classList.remove('line-through', 'text-zinc-400', 'dark:text-zinc-500');
+    }
+}
+
+    if (toggleCompleteBtn) {
+        toggleCompleteBtn.addEventListener('click', async () => {
+            const isCurrentlyComplete = toggleCompleteBtn.dataset.completed === '1';
+            const newState = !isCurrentlyComplete;
+
+            toggleCompleteBtn.dataset.completed = newState ? '1' : '0';
+            applyCompleteStyle(newState);
+
+            try {
+                const res = await fetch(`/tasks/${taskId}/complete`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    }
+                });
+
+                if (!res.ok) throw new Error('Failed to toggle');
+            } catch (err) {
+                console.error(err);
+                toggleCompleteBtn.dataset.completed = isCurrentlyComplete ? '1' : '0';
+                applyCompleteStyle(isCurrentlyComplete);
+                alert('Could not update task. Please try again.');
+            }
+        });
+    }
+
 });
 </script>
 

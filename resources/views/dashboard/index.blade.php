@@ -274,7 +274,6 @@
 
 
 
-<<<<<<< HEAD
         <div class="grid grid-cols-1 gap-2 lg:grid-cols-[minmax(0,1fr)_-10px]">
 
 
@@ -332,9 +331,6 @@
 
 
 </div>
-=======
-  
->>>>>>> 61202d45ed58db80da20e08c2f8c18e657a37a7f
 
 
 <div

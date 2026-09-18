@@ -22,7 +22,3 @@ Route::put('/tasks/{task}', [TaskController::class, 'update']);
 Route::get('/tasks/{task}/comments', [TaskController::class, 'comments']);
 Route::post('/tasks/{task}/comments', [TaskController::class, 'storeComment']);
 Route::delete('/comments/{comment}', [TaskController::class, 'destroyComment']);
-
-// Individual task details page
-Route::view('/taskdetails', 'task.taskdetails')->name('task.details');
-

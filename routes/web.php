@@ -20,4 +20,3 @@ Route::delete('/tasks/{task}', [TaskController::class, 'destroy']);
 Route::get('/tasks/{task}/comments', [TaskController::class, 'comments']);
 Route::post('/tasks/{task}/comments', [TaskController::class, 'storeComment']);
 Route::delete('/comments/{comment}', [TaskController::class, 'destroyComment']);
-

@@ -290,12 +290,30 @@
                 </div>
 
 
-                <div
-                    id="task-list"
-                    class="flex gap-4 overflow-x-auto overflow-y-visible px-5 py-4 snap-x snap-mandatory
-                        scrollbar-thin scrollbar-thumb-blue-300 scrollbar-track-transparent
-                        dark:scrollbar-thumb-zinc-700"
-                >
+                <div class="relative">
+                    <!-- Left arrow -->
+                    <button
+                        id="carousel-prev"
+                        type="button"
+                        class="absolute left-1 top-1/2 z-30 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-full border border-blue-200 bg-white/80 text-blue-700 shadow-md backdrop-blur-sm transition hover:bg-blue-50 cursor-pointer sm:left-2 sm:h-9 sm:w-9 dark:border-zinc-700 dark:bg-zinc-800/80 dark:text-zinc-200 dark:hover:bg-zinc-700"
+                        aria-label="Previous task"
+                    >
+                        ‹
+                    </button>
+
+                    <button
+                        id="carousel-next"
+                        type="button"
+                        class="absolute right-1 top-1/2 z-30 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-full border border-blue-200 bg-white/80 text-blue-700 shadow-md backdrop-blur-sm transition hover:bg-blue-50 cursor-pointer sm:right-2 sm:h-9 sm:w-9 dark:border-zinc-700 dark:bg-zinc-800/80 dark:text-zinc-200 dark:hover:bg-zinc-700"
+                        aria-label="Next task"
+                    >
+                        ›
+                    </button>
+
+                    <div
+                        id="task-list"
+                        class="relative mx-auto h-[300px] w-full max-w-5xl overflow-hidden sm:h-[340px] md:h-[380px]"
+                    ></div>
                 </div>
 
             </section>

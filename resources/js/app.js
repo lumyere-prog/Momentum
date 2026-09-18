@@ -483,12 +483,87 @@ document.addEventListener('DOMContentLoaded', () => {
     // RENDER TASKS
     // ==========================================
 
+    // ==========================================
+    // CAROUSEL STATE
+    // ==========================================
+    let activeIndex = 0;
+
+    function buildTaskCard(task) {
+        const el = document.createElement('div');
+
+        el.className =
+            'task-card absolute ' +
+            'w-[260px] min-[400px]:w-[280px] sm:w-80 md:w-96 ' +
+            'rounded-2xl border border-blue-200/60 bg-white/90 p-4 sm:p-5 md:p-6 ' +
+            'shadow-md shadow-blue-500/10 backdrop-blur-sm ' +
+            'transition-all duration-500 ease-out cursor-pointer select-none ' +
+            'dark:border-zinc-800 dark:bg-zinc-900/80 dark:shadow-black/30';
+
+        el.style.top = '50%';
+        el.style.left = '50%';
+        el.style.transform = 'translate(-50%, -50%)'; // anchor point
+        el.dataset.id = task.id;
+
+        el.innerHTML = `
+            <div class="flex items-start justify-between gap-3">
+                <h4 class="line-clamp-2 text-base font-semibold ${
+                    task.completed
+                        ? 'text-zinc-500 line-through dark:text-zinc-500'
+                        : 'text-zinc-900 dark:text-zinc-100'
+                }">
+                    ${escapeHtml(task.title)}
+                </h4>
+
+                <button
+                    class="complete-task flex h-6 w-6 shrink-0 items-center justify-center rounded-full border transition
+                    ${
+                        task.completed
+                            ? 'border-emerald-500 bg-emerald-500 text-[11px] font-bold text-white'
+                            : 'border-zinc-400 hover:border-emerald-400 hover:bg-emerald-400/10 dark:border-zinc-700'
+                    }"
+                    data-id="${task.id}"
+                    title="${task.completed ? 'Mark as incomplete' : 'Complete task'}"
+                >
+                    ${task.completed ? '✓' : ''}
+                </button>
+            </div>
+
+            <p class="mt-3 line-clamp-3 text-xs leading-5 text-zinc-600 dark:text-zinc-400">
+                ${escapeHtml(task.description || 'No description provided.')}
+            </p>
+
+            <div class="mt-4 flex flex-wrap items-center gap-2">
+                ${
+                    task.category
+                        ? `<span class="rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-medium text-blue-700 dark:bg-zinc-800 dark:text-zinc-300">${escapeHtml(task.category)}</span>`
+                        : ''
+                }
+                <span class="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-medium text-zinc-600 dark:bg-zinc-800/60 dark:text-zinc-400">
+                    ${escapeHtml(formatDisplayDate(task.due_date || task.dueDate))}
+                </span>
+                <span class="rounded-md px-2 py-0.5 text-[10px] font-medium ${getPriorityClass(task.priority)}">
+                    ${escapeHtml(task.priority)}
+                </span>
+            </div>
+
+            <button
+                class="delete-task absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-full text-zinc-400 opacity-0 transition hover:text-red-500 group-hover:opacity-100 dark:text-zinc-500 cursor-pointer"
+                data-id="${task.id}"
+                title="Delete task"
+            >
+                ×
+            </button>
+        `;
+
+        return el;
+    }
+
     function renderTasks() {
         taskList.innerHTML = '';
 
         if (tasks.length === 0) {
             taskList.innerHTML = `
-                <div class="w-full px-5 py-10 text-center">
+                <div class="text-center">
                     <div class="text-3xl">✓</div>
                     <p class="mt-3 text-sm font-medium text-zinc-500 dark:text-zinc-300">
                         No tasks yet
@@ -498,110 +573,149 @@ document.addEventListener('DOMContentLoaded', () => {
                     </p>
                 </div>
             `;
-
             updateStats();
             updateTaskDebt();
             return;
         }
 
-        tasks.forEach(task => {
-            const taskElement = document.createElement('div');
+        // clamp activeIndex
+        if (activeIndex >= tasks.length) activeIndex = tasks.length - 1;
+        if (activeIndex < 0) activeIndex = 0;
 
-            // Card wrapper — fixed width, snap, group for hover
-            taskElement.className =
-                'group relative flex w-64 shrink-0 snap-start flex-col overflow-hidden rounded-2xl border border-blue-200/60 bg-white/90 shadow-md shadow-blue-500/10 backdrop-blur-sm transition hover:shadow-lg hover:shadow-blue-500/20 cursor-pointer dark:border-zinc-800 dark:bg-zinc-900/80 dark:shadow-black/30';
-            taskElement.dataset.id = task.id;
-
-            // Priority → gradient color for the card "image" area
-            const priorityGradient = {
-                High:   'from-red-300 to-red-200 dark:from-red-900/50 dark:to-red-800/30',
-                Medium: 'from-yellow-200 to-yellow-100 dark:from-yellow-900/50 dark:to-yellow-800/30',
-                Low:    'from-emerald-200 to-emerald-100 dark:from-emerald-900/50 dark:to-emerald-800/30',
-            }[task.priority] || 'from-blue-200 to-indigo-100 dark:from-zinc-800 dark:to-zinc-700';
-
-            taskElement.innerHTML = `
-                <!-- TOP "IMAGE" AREA -->
-                <div class="relative h-28 w-full bg-gradient-to-br ${priorityGradient} flex items-center justify-center">
-
-                    <!-- Priority badge in top-right -->
-                    <span class="absolute top-2 right-2 rounded-md px-2 py-0.5 text-[10px] font-medium ${getPriorityClass(task.priority)}">
-                        ${escapeHtml(task.priority)}
-                    </span>
-
-                    <!-- Big task icon (placeholder image) -->
-                    <svg class="h-10 w-10 text-white/70 dark:text-white/40" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                        <rect x="3" y="5" width="18" height="14" rx="2" />
-                        <circle cx="9" cy="11" r="1.5" />
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 17l-4.5-4.5L9 20" />
-                    </svg>
-
-                    <!-- Complete toggle (top-left) -->
-                    <button
-                        class="complete-task absolute top-2 left-2 flex h-6 w-6 items-center justify-center rounded-full border transition
-                        ${
-                            task.completed
-                                ? 'border-emerald-500 bg-emerald-500 text-[11px] font-bold text-white'
-                                : 'border-white/80 bg-white/40 hover:bg-white/70 dark:border-zinc-600 dark:bg-zinc-800/60 dark:hover:bg-zinc-700/80'
-                        }"
-                        data-id="${task.id}"
-                        title="${task.completed ? 'Mark as incomplete' : 'Complete task'}"
-                    >
-                        ${task.completed ? '✓' : ''}
-                    </button>
-
-                </div>
-
-                <!-- BOTTOM CONTENT -->
-                <div class="flex flex-1 flex-col p-4">
-
-                    <!-- Title -->
-                    <p class="line-clamp-2 text-sm font-semibold ${
-                        task.completed
-                            ? 'text-zinc-500 line-through dark:text-zinc-500'
-                            : 'text-zinc-900 dark:text-zinc-100'
-                    }">
-                        ${escapeHtml(task.title)}
-                    </p>
-
-                    <!-- Placeholder "content lines" like the reference -->
-                    <div class="mt-3 space-y-1.5">
-                        <div class="h-2 w-3/4 rounded-full bg-blue-100 dark:bg-zinc-800"></div>
-                        <div class="h-2 w-1/2 rounded-full bg-blue-100 dark:bg-zinc-800"></div>
-                    </div>
-
-                    <!-- Category + Date chips -->
-                    <div class="mt-4 flex flex-wrap items-center gap-2">
-
-                        ${
-                            task.category
-                                ? `<span class="rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-medium text-blue-700 dark:bg-zinc-800 dark:text-zinc-300">${escapeHtml(task.category)}</span>`
-                                : ''
-                        }
-
-                        <span class="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-medium text-zinc-600 dark:bg-zinc-800/60 dark:text-zinc-400">
-                            ${escapeHtml(formatDisplayDate(task.due_date || task.dueDate))}
-                        </span>
-
-                    </div>
-
-                    <!-- Delete (bottom-right, hidden until hover) -->
-                    <button
-                        class="delete-task absolute bottom-3 right-3 flex h-6 w-6 items-center justify-center rounded-full text-zinc-400 opacity-0 transition group-hover:opacity-100 hover:text-red-500 dark:text-zinc-500 cursor-pointer"
-                        data-id="${task.id}"
-                        title="Delete task"
-                    >
-                        ×
-                    </button>
-
-                </div>
-            `;
-
-            taskList.appendChild(taskElement);
+        tasks.forEach((task, i) => {
+            const card = buildTaskCard(task);
+            card.dataset.index = i;
+            card.dataset.role = 'side'; // will be updated in applyCarouselLayout
+            taskList.appendChild(card);
         });
+
+        applyCarouselLayout();
 
         updateStats();
         updateTaskDebt();
     }
+
+    function getResponsiveMetrics() {
+        const w = window.innerWidth;
+
+        if (w < 480) {
+            // very small phones
+            return { side: 140, far: 200, centerScale: 1.05, sideScale: 0.85, blur: 3 };
+        }
+        if (w < 640) {
+            // phones
+            return { side: 170, far: 240, centerScale: 1.08, sideScale: 0.88, blur: 3 };
+        }
+        if (w < 768) {
+            // large phones / small tablets
+            return { side: 210, far: 290, centerScale: 1.1, sideScale: 0.9, blur: 3 };
+        }
+        if (w < 1024) {
+            // tablets
+            return { side: 250, far: 330, centerScale: 1.12, sideScale: 0.92, blur: 3 };
+        }
+        // desktop
+        return { side: 280, far: 360, centerScale: 1.15, sideScale: 0.92, blur: 3 };
+    }
+
+    function applyCarouselLayout() {
+        const cards = taskList.querySelectorAll('.task-card');
+        const total = cards.length;
+        const m = getResponsiveMetrics();
+
+        cards.forEach((card, i) => {
+            let offset = i - activeIndex;
+            if (offset > total / 2) offset -= total;
+            if (offset < -total / 2) offset += total;
+
+            card.style.transition =
+                'transform 550ms cubic-bezier(.22,.61,.36,1), opacity 550ms, filter 550ms';
+
+            if (offset === 0) {
+                card.style.transform =
+                    `translate(-50%, -50%) scale(${m.centerScale})`;
+                card.style.opacity = '1';
+                card.style.filter = 'blur(0px)';
+                card.style.zIndex = '30';
+                card.style.pointerEvents = 'auto';
+            } else if (offset === -1) {
+                card.style.transform =
+                    `translate(calc(-50% - ${m.side}px), -50%) scale(${m.sideScale})`;
+                card.style.opacity = '0.6';
+                card.style.filter = `blur(${m.blur}px)`;
+                card.style.zIndex = '20';
+                card.style.pointerEvents = 'auto';
+            } else if (offset === 1) {
+                card.style.transform =
+                    `translate(calc(-50% + ${m.side}px), -50%) scale(${m.sideScale})`;
+                card.style.opacity = '0.6';
+                card.style.filter = `blur(${m.blur}px)`;
+                card.style.zIndex = '20';
+                card.style.pointerEvents = 'auto';
+            } else {
+                const dir = offset < 0 ? -1 : 1;
+                card.style.transform =
+                    `translate(calc(-50% + ${dir * m.far}px), -50%) scale(0.7)`;
+                card.style.opacity = '0';
+                card.style.filter = 'blur(8px)';
+                card.style.zIndex = '10';
+                card.style.pointerEvents = 'none';
+            }
+        });
+    }
+
+    // ==========================================
+    // CAROUSEL NAVIGATION
+    // ==========================================
+
+    function nextTask() {
+        if (tasks.length === 0) return;
+        activeIndex = (activeIndex + 1) % tasks.length;
+        applyCarouselLayout();
+    }
+
+    function prevTask() {
+        if (tasks.length === 0) return;
+        activeIndex = (activeIndex - 1 + tasks.length) % tasks.length;
+        applyCarouselLayout();
+    }
+
+    // click a card → center it
+    taskList.addEventListener('click', (event) => {
+        // ignore buttons (complete / delete) — they keep their own behavior
+        if (event.target.closest('.complete-task') || event.target.closest('.delete-task')) {
+            return;
+        }
+
+        const card = event.target.closest('.task-card');
+        if (!card) return;
+
+        const i = Number(card.dataset.index);
+        if (Number.isNaN(i)) return;
+
+        if (i === activeIndex) {
+            // already centered — open the task detail page
+            window.location.href = `/task?task=${card.dataset.id}`;
+            return;
+        }
+
+        activeIndex = i;
+        applyCarouselLayout();
+    });
+
+    document.getElementById('carousel-prev')?.addEventListener('click', prevTask);
+    document.getElementById('carousel-next')?.addEventListener('click', nextTask);
+
+    // ==========================================
+    // RESPONSIVE CAROUSEL ON RESIZE
+    // ==========================================
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            applyCarouselLayout();
+        }, 120);
+    });
 
 
     // ==========================================

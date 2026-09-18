@@ -40,6 +40,32 @@ class TaskController extends Controller
         ], 201);
     }
 
+
+            // Update an existing task
+        public function update(Request $request, Task $task)
+        {
+            $validated = $request->validate([
+                'title'       => 'required|string|max:255',
+                'description' => 'nullable|string|max:255',
+                'priority'    => 'required|string|in:Low,Medium,High',
+                'category'    => 'nullable|string|max:100',
+                'due_date'    => 'required|date',
+            ]);
+
+            $task->update([
+                'title'       => $validated['title'],
+                'description' => $validated['description'],
+                'priority'    => $validated['priority'],
+                'category'    => $validated['category'],
+                'due_date'    => $validated['due_date'],
+            ]);
+
+            return response()->json([
+                'message' => 'Task updated successfully!',
+                'task'    => $task
+            ]);
+        }
+
     public function toggleComplete(Task $task)
     {
         $task->completed = !$task->completed;

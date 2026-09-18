@@ -39,11 +39,18 @@
                         >
                     </div>
 
-                    <div class="min-w-0">
-                        <p class="mt-0 text-sm font-bold text-zinc-900 sm:text-base md:text-lg dark:text-zinc-100">
-                            Make a list, Conquer your day!
-                        </p>
-                    </div>
+                   <div class="flex min-w-0 flex-col gap-1 sm:flex-row sm:items-center sm:gap-3">
+    <p class="mt-0 text-sm font-bold text-zinc-900 sm:text-base md:text-lg dark:text-zinc-100">
+        Make a list, Conquer your day!
+    </p>
+
+    <a
+        href="{{ route('task') }}"
+        class="inline-flex shrink-0 items-center gap-1 rounded-lg border border-blue-200 bg-white/70 px-3 py-1.5 text-xs font-medium text-blue-700 shadow-sm transition hover:bg-blue-50 hover:text-blue-800 dark:border-zinc-700 dark:bg-zinc-800/70 dark:text-zinc-200 dark:hover:bg-zinc-700 dark:hover:text-white"
+    >
+        View all Task →
+    </a>
+</div>
 
                 </div>
 
@@ -267,6 +274,7 @@
 
 
 
+<<<<<<< HEAD
         <div class="grid grid-cols-1 gap-2 lg:grid-cols-[minmax(0,1fr)_-10px]">
 
 
@@ -324,6 +332,9 @@
 
 
 </div>
+=======
+  
+>>>>>>> 61202d45ed58db80da20e08c2f8c18e657a37a7f
 
 
 <div

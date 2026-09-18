@@ -1,252 +1,189 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Task Details - Momentum</title>
-    <script>
-        if (localStorage.getItem('theme') === 'dark' ||
-            (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
-    </script>
+<meta name="csrf-token" content="{{ csrf_token() }}">
 
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
+    <div class="flex h-screen flex-col overflow-hidden px-10 py-2">
+    <div class="flex min-h-0 flex-1 flex-col gap-4">
 
-<body class="min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-indigo-100 text-zinc-900 antialiased dark:from-zinc-950 dark:via-zinc-950 dark:to-zinc-900 dark:text-zinc-100">
+        {{-- ============================================= --}}
+        {{-- PAGE HEADER — Back button + centered title --}}
+        {{-- ============================================= --}}
+        <div class="relative flex shrink-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 
-<div class="min-h-screen">
+            <div class="hidden sm:block sm:w-40"></div>
 
-    <header>
-        <div class="mx-auto w-full px-10 py-2">
-            <div class="flex items-center justify-between py-4">
-
-                <a href="/" class="flex items-center gap-3">
-                    <div class="flex h-14 w-14 shrink-0 sm:h-16 sm:w-16">
-                        <img src="{{ asset('images/logo2.png') }}" alt="Logo" class="h-full w-full object-contain">
-                    </div>
-                    <p class="text-sm font-bold text-zinc-900 sm:text-base dark:text-zinc-100">
-                        Task Details
-                    </p>
-                </a>
-
-                <a href="/"
-                   class="rounded-lg border border-blue-200 bg-white/70 px-4 py-2 text-xs font-medium text-blue-700 transition hover:bg-blue-50 dark:border-zinc-700 dark:bg-zinc-800/70 dark:text-zinc-200 dark:hover:bg-zinc-700">
-                    ← Back to tasks
-                </a>
-
-            </div>
-        </div>
-    </header>
-
-    <main class="mx-auto w-full max-w-3xl px-10 py-6 space-y-5">
-
-        <!-- TASK DETAILS CARD -->
-        <div class="rounded-xl border border-blue-200/60 bg-white/90 p-6 shadow-md shadow-blue-500/10 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-900/80 dark:shadow-black/30">
-
-            <div class="flex items-start justify-between gap-4 mb-5">
-                <h1 id="task-title" class="text-lg font-semibold text-zinc-900 dark:text-white">
-                    Loading...
+            <div class="min-w-0 text-center">
+                <h1 class="text-lg font-semibold text-zinc-900 dark:text-white">
+                    All Tasks
                 </h1>
-                <span id="task-priority" class="shrink-0 rounded-md px-2 py-0.5 text-[10px] font-medium"></span>
+                <p class="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
+                    Manage everything on your plate.
+                </p>
             </div>
 
-            <div class="mb-5">
-                <span class="text-xs font-medium text-zinc-500 block mb-1.5 dark:text-zinc-400">Description</span>
-                <p id="task-description" class="rounded-lg bg-blue-50/60 border border-blue-100 p-3 text-sm text-zinc-800 min-h-[60px] whitespace-pre-wrap dark:border-zinc-800 dark:bg-zinc-800 dark:text-zinc-200"></p>
-            </div>
+            <div class="flex flex-wrap items-center justify-center gap-2 sm:w-40 sm:justify-end">
 
-            <div class="grid grid-cols-2 gap-5">
-                <div>
-                    <span class="text-xs font-medium text-zinc-500 block mb-1.5 dark:text-zinc-400">Category</span>
-                    <span id="task-category" class="text-sm text-zinc-700 dark:text-zinc-300">None</span>
-                </div>
-                <div>
-                    <span class="text-xs font-medium text-zinc-500 block mb-1.5 dark:text-zinc-400">Due Date</span>
-                    <span id="task-due-date" class="text-sm text-zinc-700 dark:text-zinc-300">—</span>
-                </div>
+                <a
+                    href="{{ url('/') }}"
+                    class="inline-flex h-10 shrink-0 items-center justify-center gap-1.5 rounded-xl border border-blue-200 bg-white/70 px-4 text-sm font-semibold text-blue-700 shadow-lg shadow-blue-500/10 transition hover:bg-blue-50 hover:text-blue-800 cursor-pointer dark:border-zinc-700 dark:bg-zinc-800/70 dark:text-zinc-200 dark:hover:bg-zinc-700 dark:hover:text-white"
+                >
+                    ← Back
+                </a>
+
             </div>
 
         </div>
 
-        <!-- COMMENTS CARD -->
-        <div class="rounded-xl border border-blue-200/60 bg-white/90 p-6 shadow-md shadow-blue-500/10 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-900/80 dark:shadow-black/30">
 
-            <div class="mb-5 border-b border-blue-100 pb-4 dark:border-zinc-800">
-                <h2 class="text-sm font-semibold text-zinc-900 dark:text-white">Activity & Comments</h2>
-                <p class="mt-1 text-xs text-zinc-500 dark:text-zinc-400">Share updates or notes about this task.</p>
-            </div>
+        {{-- ============================================= --}}
+        {{-- FILTER + SEARCH CARD --}}
+        {{-- ============================================= --}}
+        <div class="min-w-0 shrink-0 rounded-xl border border-blue-200/60 bg-white/90 p-5 shadow-md shadow-blue-500/10 backdrop-blur-sm sm:p-6 transition hover:shadow-lg hover:shadow-blue-500/20
+             dark:border-zinc-800 dark:bg-zinc-900/80 dark:shadow-black/30">
 
-            <div id="comments-list" class="mb-5 space-y-3">
-                <p class="text-xs text-zinc-500 italic dark:text-zinc-400">Loading comments...</p>
-            </div>
+            <p class="text-xs font-medium uppercase tracking-wider text-black dark:text-blue-400">
+                Filters
+            </p>
 
-            <form id="comment-form" class="flex gap-2">
-                <input
-                    type="text"
-                    id="comment-input"
-                    placeholder="Write a comment..."
-                    required
-                    class="flex-1 rounded-lg border border-blue-200 bg-blue-50/50 px-3 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white dark:placeholder-zinc-500"
-                >
-                <button
-                    type="submit"
-                    class="cursor-pointer rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-2.5 text-sm font-medium text-white shadow-md shadow-blue-500/30 transition hover:from-blue-700 hover:to-indigo-700"
-                >
-                    Post
+            {{-- FILTER BUTTONS --}}
+            <div class="mt-4 flex flex-wrap items-center gap-1 rounded-lg bg-blue-50/60 p-1 dark:bg-zinc-800/60">
+
+                <button type="button" data-filter="all"
+                    class="filter-btn rounded-md px-3 py-1.5 text-xs font-medium transition">
+                    All
                 </button>
-            </form>
+                <button type="button" data-filter="unfinished"
+                    class="filter-btn rounded-md px-3 py-1.5 text-xs font-medium transition">
+                    Unfinished
+                </button>
+                <button type="button" data-filter="finished"
+                    class="filter-btn rounded-md px-3 py-1.5 text-xs font-medium transition">
+                    Finished
+                </button>
+
+            </div>
+
+            {{-- SEARCH ROW --}}
+            <div class="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
+
+                <input type="text" id="search-name" placeholder="Search by name or category..."
+                    class="w-full rounded-lg border border-blue-200 bg-blue-50/50 px-3 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white dark:placeholder-zinc-500">
+
+                <select id="search-priority"
+                    class="w-full rounded-lg border border-blue-200 bg-blue-50/50 px-3 py-2.5 text-sm text-zinc-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white">
+                    <option value="">All priorities</option>
+                    <option value="High">High</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Low">Low</option>
+                </select>
+
+                <input type="date" id="search-date"
+                    class="w-full rounded-lg border border-blue-200 bg-blue-50/50 px-3 py-2.5 text-sm text-zinc-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white">
+
+            </div>
 
         </div>
 
-    </main>
+
+        {{-- ============================================= --}}
+        {{-- TASK LIST CARD --}}
+        {{-- ============================================= --}}
+        <section class="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-xl border border-blue-200/60 bg-white/90 shadow-md shadow-blue-500/10 backdrop-blur-sm 
+            dark:border-zinc-800 dark:bg-zinc-900/80">
+
+            <div class="flex shrink-0 flex-col gap-3 border-b border-blue-100 px-5 py-4 sm:flex-row sm:items-center 
+                sm:justify-between sm:px-6 dark:border-zinc-800">
+
+                <div class="min-w-0">
+
+                    <p class="text-xs font-medium uppercase tracking-wider text-black dark:text-blue-400">
+                        Task List
+                    </p>
+
+                    <p class="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+                        <span class="text-3xl font-semibold text-zinc-900 dark:text-white" id="remaining-tasks">0</span>
+                        <span class="text-xs">tasks remaining</span>
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div
+                id="task-list"
+                class="min-h-0 flex-1 overflow-y-auto divide-y divide-blue-100/70 
+                dark:divide-zinc-800/70"
+            >
+                {{-- JS injects task rows here --}}
+            </div>
+
+        </section>
+
+    </div>
 
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const params = new URLSearchParams(window.location.search);
-    const taskId = params.get('task');
 
-    const taskTitle = document.getElementById('task-title');
-    const taskPriority = document.getElementById('task-priority');
-    const taskDescription = document.getElementById('task-description');
-    const taskCategory = document.getElementById('task-category');
-    const taskDueDate = document.getElementById('task-due-date');
-    const commentsList = document.getElementById('comments-list');
-    const commentForm = document.getElementById('comment-form');
-    const commentInput = document.getElementById('comment-input');
+{{-- ============================================= --}}
+{{-- VIEW TASK MODAL --}}
+{{-- ============================================= --}}
+<div
+    id="view-task-modal"
+    class="fixed inset-0 z-50 hidden flex items-center justify-center bg-blue-950/50 px-4 backdrop-blur-sm dark:bg-black/70"
+>
+    <div class="w-full max-w-lg rounded-xl border border-blue-200 bg-white p-6 shadow-2xl shadow-blue-500/20 sm:p-7 dark:border-zinc-800 dark:bg-zinc-900 dark:shadow-black/50">
 
-    const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+        <div class="mb-5 flex items-center justify-between gap-4 border-b border-blue-100 pb-4 dark:border-zinc-800">
 
-    function escapeHtml(value) {
-        const div = document.createElement('div');
-        div.textContent = value ?? '';
-        return div.innerHTML;
-    }
+            <h3 id="view-task-title" class="text-base font-semibold text-zinc-900 dark:text-white">
+                Task Title
+            </h3>
 
-    function getPriorityClass(priority) {
-        switch (priority) {
-            case 'High':   return 'bg-red-400/10 text-red-400';
-            case 'Medium': return 'bg-yellow-400/10 text-yellow-400';
-            case 'Low':    return 'bg-emerald-400/10 text-emerald-400';
-            default:       return 'bg-zinc-800 text-zinc-500';
-        }
-    }
+            <button
+                id="close-view-modal"
+                type="button"
+                class="shrink-0 text-lg text-zinc-400 transition hover:text-zinc-900 dark:hover:text-white"
+            >
+                &times;
+            </button>
 
-    if (!taskId) {
-        taskTitle.textContent = 'No task selected';
-        taskDescription.textContent = 'Go back and click a task to see its details.';
-        commentForm.style.display = 'none';
-        return;
-    }
+        </div>
 
-    // Load details ng task dito
-    fetch('/tasks', { headers: { 'Accept': 'application/json' } })
-        .then(res => res.json())
-        .then(data => {
-            const tasks = Array.isArray(data) ? data : (data.tasks || data.data || []);
-            const task = tasks.find(t => String(t.id) === String(taskId));
+        <div class="space-y-4">
 
-            if (!task) {
-                taskTitle.textContent = `Task #${taskId}`;
-                return;
-            }
+            <div>
+                <p class="mb-1 text-xs font-medium text-zinc-500 dark:text-zinc-400">Description</p>
+                <p id="view-task-description" class="text-sm text-zinc-700 dark:text-zinc-200">—</p>
+            </div>
 
-            taskTitle.textContent = task.title;
-            taskDescription.textContent = task.description || 'No description provided.';
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <p class="mb-1 text-xs font-medium text-zinc-500 dark:text-zinc-400">Priority</p>
+                    <p id="view-task-priority" class="text-sm text-zinc-700 dark:text-zinc-200">—</p>
+                </div>
+                <div>
+                    <p class="mb-1 text-xs font-medium text-zinc-500 dark:text-zinc-400">Category</p>
+                    <p id="view-task-category" class="text-sm text-zinc-700 dark:text-zinc-200">—</p>
+                </div>
+            </div>
 
-            taskPriority.textContent = task.priority;
-            taskPriority.className = `shrink-0 rounded-md px-2 py-0.5 text-[10px] font-medium ${getPriorityClass(task.priority)}`;
+            <div>
+                <p class="mb-1 text-xs font-medium text-zinc-500 dark:text-zinc-400">Due Date</p>
+                <p id="view-task-due-date" class="text-sm text-zinc-700 dark:text-zinc-200">—</p>
+            </div>
 
-            taskCategory.textContent = task.category || 'None';
+        </div>
 
-            const due = task.due_date || task.dueDate;
-            taskDueDate.textContent = due ? due.split('T')[0] : 'No due date';
-        })
-        .catch(err => {
-            console.error('Failed to load task:', err);
-            taskTitle.textContent = `Task #${taskId}`;
-        });
+        <div class="mt-7 flex justify-end">
+            <button
+                id="close-view-modal-btn"
+                type="button"
+                class="rounded-xl border border-blue-200 bg-white/70 px-4 py-2 text-sm font-semibold text-blue-700 transition hover:bg-blue-50 cursor-pointer dark:border-zinc-700 dark:bg-zinc-800/70 dark:text-zinc-200 dark:hover:bg-zinc-700"
+            >
+                Close
+            </button>
+        </div>
 
-    // Load comments
-    function loadComments() {
-        commentsList.innerHTML = '<p class="text-xs text-zinc-500 dark:text-zinc-400">Loading comments...</p>';
+    </div>
+</div>
 
-        fetch(`/tasks/${taskId}/comments`, { headers: { 'Accept': 'application/json' } })
-            .then(res => res.json())
-            .then(comments => {
-                commentsList.innerHTML = '';
 
-                if (!Array.isArray(comments) || comments.length === 0) {
-                    commentsList.innerHTML = '<p class="text-xs text-zinc-500 italic dark:text-zinc-400">No comments yet.</p>';
-                    return;
-                }
-
-                comments.forEach(comment => {
-                    const div = document.createElement('div');
-                    div.className = 'flex items-start justify-between gap-3 rounded-lg bg-blue-50 border border-blue-100 px-3 py-2.5 text-sm dark:bg-zinc-800 dark:border-zinc-700';
-                    div.innerHTML = `
-                        <div class="min-w-0 flex-1">
-                            <p class="text-zinc-800 dark:text-zinc-200 whitespace-pre-wrap">${escapeHtml(comment.body)}</p>
-                            ${comment.created_at ? `<p class="mt-1 text-[10px] text-zinc-500 dark:text-zinc-500">${escapeHtml(new Date(comment.created_at).toLocaleString())}</p>` : ''}
-                        </div>
-                        <button class="delete-comment shrink-0 text-zinc-500 hover:text-red-400 cursor-pointer dark:text-zinc-400" data-id="${comment.id}" title="Delete">×</button>
-                    `;
-                    commentsList.appendChild(div);
-                });
-            })
-            .catch(err => {
-                console.error('Error loading comments:', err);
-                commentsList.innerHTML = '<p class="text-xs text-red-400">Failed to load comments.</p>';
-            });
-    }
-
-    loadComments();
-
-    // Post comment
-    commentForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const body = commentInput.value.trim();
-        if (!body) return;
-
-        const res = await fetch(`/tasks/${taskId}/comments`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'X-CSRF-TOKEN': csrfToken
-            },
-            body: JSON.stringify({ body })
-        });
-
-        if (res.ok) {
-            commentInput.value = '';
-            loadComments();
-        }
-    });
-
-    // Delete comment
-    commentsList.addEventListener('click', async (e) => {
-        if (!e.target.classList.contains('delete-comment')) return;
-        const commentId = e.target.dataset.id;
-
-        const res = await fetch(`/comments/${commentId}`, {
-            method: 'DELETE',
-            headers: {
-                'Accept': 'application/json',
-                'X-CSRF-TOKEN': csrfToken
-            }
-        });
-
-        if (res.ok) loadComments();
-    });
-});
-</script>
-
-</body>
-</html>
+@vite(['resources/css/app.css', 'resources/js/app.js'])

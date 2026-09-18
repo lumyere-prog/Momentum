@@ -550,7 +550,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 3. Click row → open task detail page (same tab)
     if (taskRow) {
         const id = taskRow.dataset.id;
-        window.location.href = `/comment?task=${id}`;
+        window.location.href = `/task?task=${id}`;
     }
 });
 

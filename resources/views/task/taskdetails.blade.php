@@ -61,6 +61,15 @@ bg-gradient-to-br from-blue-50 via-blue-100 to-indigo-100 text-zinc-900 antialia
         {{-- PRIORITY BADGE --}}
         <span id="task-priority" class="rounded-md px-2 py-0.5 text-[10px] font-medium"></span>
 
+        {{-- 🆕 EDIT BUTTON --}}
+            <button
+            id="edit-task-btn"
+            type="button"
+            class="rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-2 text-sm font-medium text-zinc-200 transition hover:bg-zinc-700"
+        >
+            Edit
+        </button>
+
         {{-- 🆕 DONE BUTTON --}}
         <button
             id="toggle-complete"
@@ -128,6 +137,127 @@ bg-gradient-to-br from-blue-50 via-blue-100 to-indigo-100 text-zinc-900 antialia
 
         </div>
 
+
+        <!-- EDIT -->
+                            <!-- Edit Task Modal -->
+                    <div
+                        id="edit-task-modal"
+                        class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 px-4"
+                    >
+                        <div class="w-full max-w-lg rounded-2xl border border-zinc-800 bg-zinc-900 p-6 shadow-2xl">
+
+                            <!-- Modal Header -->
+                            <div class="mb-6 flex items-center justify-between">
+                                <div>
+                                    <h2 class="text-lg font-semibold text-white">Edit Task</h2>
+                                    <p class="text-sm text-zinc-400">Update your task details.</p>
+                                </div>
+
+                                <button
+                                    id="close-edit-modal"
+                                    type="button"
+                                    class="text-2xl text-zinc-400 hover:text-white"
+                                >
+                                    &times;
+                                </button>
+                            </div>
+
+                            <!-- Edit Form -->
+                            <form id="edit-task-form" class="space-y-4">
+
+                                <!-- Title -->
+                                <div>
+                                    <label class="mb-1 block text-sm font-medium text-zinc-300">
+                                        Task Title
+                                    </label>
+
+                                    <input
+                                        id="edit-task-title"
+                                        type="text"
+                                        required
+                                        class="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white outline-none focus:border-zinc-500"
+                                    >
+                                </div>
+
+                                <!-- Description -->
+                                <div>
+                                    <label class="mb-1 block text-sm font-medium text-zinc-300">
+                                        Description
+                                    </label>
+
+                                    <textarea
+                                        id="edit-task-description"
+                                        rows="3"
+                                        class="w-full resize-none rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white outline-none focus:border-zinc-500"
+                                    ></textarea>
+                                </div>
+
+                                <!-- Priority -->
+                                <div>
+                                    <label class="mb-1 block text-sm font-medium text-zinc-300">
+                                        Priority
+                                    </label>
+
+                                    <select
+                                        id="edit-task-priority"
+                                        required
+                                        class="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white outline-none focus:border-zinc-500"
+                                    >
+                                        <option value="Low">Low</option>
+                                        <option value="Medium">Medium</option>
+                                        <option value="High">High</option>
+                                    </select>
+                                </div>
+
+                                <!-- Category -->
+                                <div>
+                                    <label class="mb-1 block text-sm font-medium text-zinc-300">
+                                        Category
+                                    </label>
+
+                                    <input
+                                        id="edit-task-category"
+                                        type="text"
+                                        class="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white outline-none focus:border-zinc-500"
+                                    >
+                                </div>
+
+                                <!-- Due Date -->
+                                <div>
+                                    <label class="mb-1 block text-sm font-medium text-zinc-300">
+                                        Due Date
+                                    </label>
+
+                                    <input
+                                        id="edit-task-due-date"
+                                        type="date"
+                                        required
+                                        class="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white outline-none focus:border-zinc-500"
+                                    >
+                                </div>
+
+                                <!-- Buttons -->
+                                <div class="flex justify-end gap-2 pt-3">
+                                    <button
+                                        id="cancel-edit"
+                                        type="button"
+                                        class="rounded-lg border border-zinc-700 px-4 py-2 text-sm text-zinc-300 hover:bg-zinc-800"
+                                    >
+                                        Cancel
+                                    </button>
+
+                                    <button
+                                        type="submit"
+                                        class="rounded-lg bg-white px-4 py-2 text-sm font-medium text-black hover:bg-zinc-200"
+                                    >
+                                        Save Changes
+                                    </button>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+
     </main>
 
 </div>
@@ -136,6 +266,22 @@ bg-gradient-to-br from-blue-50 via-blue-100 to-indigo-100 text-zinc-900 antialia
 document.addEventListener('DOMContentLoaded', () => {
     const params = new URLSearchParams(window.location.search);
     const taskId = params.get('task');
+
+
+    let currentTask = null;
+
+    const editTaskBtn = document.getElementById('edit-task-btn');
+    const editTaskModal = document.getElementById('edit-task-modal');
+    const closeEditModal = document.getElementById('close-edit-modal');
+    const cancelEdit = document.getElementById('cancel-edit');
+    const editTaskForm = document.getElementById('edit-task-form');
+
+    const editTaskTitle = document.getElementById('edit-task-title');
+    const editTaskDescription = document.getElementById('edit-task-description');
+    const editTaskPriority = document.getElementById('edit-task-priority');
+    const editTaskCategory = document.getElementById('edit-task-category');
+    const editTaskDueDate = document.getElementById('edit-task-due-date');
+
 
     const taskTitle = document.getElementById('task-title');
     const taskPriority = document.getElementById('task-priority');
@@ -180,10 +326,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const tasks = Array.isArray(data) ? data : (data.tasks || data.data || []);
             const task = tasks.find(t => String(t.id) === String(taskId));
 
-            if (!task) {
-                taskTitle.textContent = `Task #${taskId}`;
-                return;
-            }
+if (!task) {
+    taskTitle.textContent = `Task #${taskId}`;
+    return;
+}
+
+currentTask = task;
 
             taskTitle.textContent = task.title;
             taskDescription.textContent = task.description || 'No description provided.';
@@ -338,6 +486,93 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+    // Open Edit Modal
+editTaskBtn.addEventListener('click', () => {
+    if (!currentTask) return;
+
+    editTaskTitle.value = currentTask.title || '';
+    editTaskDescription.value = currentTask.description || '';
+    editTaskPriority.value = currentTask.priority || 'Medium';
+    editTaskCategory.value = currentTask.category || '';
+
+    const due = currentTask.due_date || currentTask.dueDate;
+    editTaskDueDate.value = due ? String(due).split('T')[0] : '';
+
+    editTaskModal.classList.remove('hidden');
+    editTaskModal.classList.add('flex');
+});
+
+// Close Edit Modal
+function closeEditTaskModal() {
+    editTaskModal.classList.add('hidden');
+    editTaskModal.classList.remove('flex');
+}
+
+closeEditModal.addEventListener('click', closeEditTaskModal);
+cancelEdit.addEventListener('click', closeEditTaskModal);
+
+editTaskModal.addEventListener('click', (event) => {
+    if (event.target === editTaskModal) {
+        closeEditTaskModal();
+    }
+});
+
+// Save Edited Task
+editTaskForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    try {
+        const response = await fetch(`/tasks/${taskId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document
+                    .querySelector('meta[name="csrf-token"]')
+                    .getAttribute('content')
+            },
+            body: JSON.stringify({
+                title: editTaskTitle.value.trim(),
+                description: editTaskDescription.value.trim(),
+                priority: editTaskPriority.value,
+                category: editTaskCategory.value.trim(),
+                due_date: editTaskDueDate.value
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            console.error(data);
+            alert('Failed to update task.');
+            return;
+        }
+
+        currentTask = data.task;
+
+        // Update task details on the page
+        taskTitle.textContent = currentTask.title;
+        taskDescription.textContent =
+            currentTask.description || 'No description provided.';
+
+        taskCategory.textContent =
+            currentTask.category || 'None';
+
+        const due = currentTask.due_date || currentTask.dueDate;
+        taskDueDate.textContent =
+            due ? String(due).split('T')[0] : 'No due date';
+
+        taskPriority.textContent = currentTask.priority;
+        taskPriority.className =
+            `shrink-0 rounded-md px-2 py-0.5 text-[10px] font-medium ${getPriorityClass(currentTask.priority)}`;
+
+        closeEditTaskModal();
+
+    } catch (error) {
+        console.error('Failed to update task:', error);
+        alert('Something went wrong while updating the task.');
+    }
+});
 
 });
 </script>

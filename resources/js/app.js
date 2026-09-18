@@ -68,9 +68,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // BASIC CHECK
     // ==========================================
 
-    if (!taskList || !taskModal || !taskForm) {
-        return;
-    }
+    if (!taskList) {
+    return;
+}
 
 
     // ==========================================
@@ -438,7 +438,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================
     // CREATE TASK (SAVING TO LARAVEL DB)
     // ==========================================
-
+    if (taskForm) {
     taskForm.addEventListener('submit', async (event) => {
         event.preventDefault();
 
@@ -484,6 +484,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error("Network Error:", error);
         }
     });
+}
 
 
     // ==========================================
@@ -547,12 +548,14 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    // 3. Click row → open task detail page (same tab)
-    if (taskRow) {
-        const id = taskRow.dataset.id;
-        window.location.href = `/task?task=${id}`;
-    }
+    
+if (taskRow) {
+    const id = taskRow.dataset.id;
+    window.location.href = `/taskdetails?task=${id}`;
+}
 });
+
+
 
 
     // ==========================================

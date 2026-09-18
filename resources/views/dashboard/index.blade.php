@@ -263,43 +263,7 @@
 
 
 
-        <div class="grid grid-cols-1 gap-2 lg:grid-cols-[minmax(0,1fr)_-10px]">
-
-
-            <section class="min-w-0 overflow-hidden rounded-xl border border-blue-200/60 bg-white/90 shadow-md shadow-blue-500/10 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-900/80 dark:shadow-black/30">
-
-                <div class="flex flex-col gap-3 border-b border-blue-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 dark:border-zinc-800">
-
-                    <div class="min-w-0">
-
-                        <h3 class="text-sm font-semibold text-zinc-900 dark:text-white">
-                            Today's tasks
-                        </h3>
-
-                        <p class="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
-                            <span id="remaining-tasks">0</span>
-                            tasks remaining
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <div
-                    id="task-list"
-                    class="divide-y divide-blue-100/70 dark:divide-zinc-800/70"
-                >
-                </div>
-
-            </section>
-
-        </div>
-
-    </main>
-
-
-</div>
+  
 
 
 <div

@@ -16,6 +16,7 @@
             document.documentElement.classList.remove('dark');
         }
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -92,8 +93,83 @@
         </div>
 
 
-        <div class="mb-2 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
+        <div class="mb-2 grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-5">
 
+            <div class="rounded-xl border border-blue-200/60 bg-white/90 p-5 shadow-md shadow-blue-500/10 backdrop-blur-sm sm:p-6 transition hover:shadow-lg hover:shadow-blue-500/20 dark:border-zinc-800 dark:bg-zinc-900/80 dark:shadow-black/30 lg:row-span-3 flex flex-col justify-between">
+
+                <div class="flex items-center justify-between">
+
+                    <h3 class="text-sm font-semibold text-zinc-900 dark:text-white">
+                        PRODUCTIVITY
+                    </h3>
+
+                    <span class="text-[11px] text-zinc-500 dark:text-zinc-400">
+                        This week
+                    </span>
+
+                </div>
+
+                <div class="mt-6 flex flex-col items-center gap-6">
+
+                    <!-- Donut graph (unchanged) -->
+                    <div
+                        id="productivity-circle"
+                        class="productivity-circle relative flex h-36 w-36 shrink-0 items-center justify-center rounded-full"
+                        style="--progress: 0%;"
+                    >
+                        <div class="absolute inset-[10px] flex items-center justify-center rounded-full bg-white dark:bg-zinc-900">
+                            <div class="text-center">
+
+                                <p
+                                    id="sidebar-percentage"
+                                    class="text-3xl font-semibold text-zinc-900 dark:text-white"
+                                >
+                                    0%
+                                </p>
+
+                                <p class="text-[10px] text-zinc-500 dark:text-zinc-400">
+                                    score
+                                </p>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Line graph (weekly completed) -->
+                    <div class="w-full">
+
+                        <div class="mb-3 flex items-center justify-between gap-2">
+
+                            <span class="text-xs text-zinc-600 dark:text-zinc-400">
+                                Completed this week
+                            </span>
+
+                            <span
+                                id="sidebar-task-count"
+                                class="text-xs font-medium text-zinc-900 dark:text-white"
+                            >
+                                0 / 0
+                            </span>
+
+                        </div>
+
+                        <div class="h-28 w-full">
+                            <canvas id="weekly-chart"></canvas>
+                        </div>
+
+                        <p class="mt-3 text-[11px] leading-4 text-zinc-500 dark:text-zinc-500">
+                            Keep completing tasks to improve your score.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- ============================================ -->
+            <!-- RIGHT: TODAY'S TASKS                         -->
+            <!-- ============================================ -->
             <div class="min-w-0 rounded-xl border border-blue-200/60 bg-white/90 p-5 shadow-md shadow-blue-500/10 backdrop-blur-sm sm:p-6 transition hover:shadow-lg hover:shadow-blue-500/20 dark:border-zinc-800 dark:bg-zinc-900/80 dark:shadow-black/30">
 
                 <p class="text-xs font-medium uppercase tracking-wider text-black dark:text-blue-400">
@@ -117,7 +193,9 @@
 
             </div>
 
-
+            <!-- ============================================ -->
+            <!-- RIGHT: COMPLETED                             -->
+            <!-- ============================================ -->
             <div class="min-w-0 rounded-xl border border-blue-200/60 bg-white/90 p-5 shadow-md shadow-blue-500/10 backdrop-blur-sm sm:p-6 transition hover:shadow-lg hover:shadow-blue-500/20 dark:border-zinc-800 dark:bg-zinc-900/80 dark:shadow-black/30">
 
                 <p class="text-xs font-medium uppercase tracking-wider text-black dark:text-blue-400">
@@ -144,84 +222,9 @@
 
             </div>
 
-            <div class="rounded-xl border border-blue-200/60 bg-white/90 p-5 shadow-md shadow-blue-500/10 backdrop-blur-sm sm:p-6 transition hover:shadow-lg hover:shadow-blue-500/20 dark:border-zinc-800 dark:bg-zinc-900/80 dark:shadow-black/30">
-
-                <div class="flex items-center justify-between">
-
-                    <h3 class="text-sm font-semibold text-zinc-900 dark:text-white">
-                        PRODUCTIVITY
-                    </h3>
-
-                    <span class="text-[11px] text-zinc-500 dark:text-zinc-400">
-                        This week
-                    </span>
-
-                </div>
-
-
-                <div class="mt-4 flex flex-col gap-5 min-[400px]:flex-row min-[400px]:items-center">
-
-                    <div
-                        id="productivity-circle"
-                        class="productivity-circle relative mx-auto flex h-24 w-24 shrink-0 items-center justify-center rounded-full min-[400px]:mx-0"
-                        style="--progress: 0%;"
-                    >
-                        <div class="absolute inset-[7px] flex items-center justify-center rounded-full bg-white dark:bg-zinc-900">
-                            <div class="text-center">
-
-                                <p
-                                    id="sidebar-percentage"
-                                    class="text-xl font-semibold text-zinc-900 dark:text-white"
-                                >
-                                    0%
-                                </p>
-
-                                <p class="text-[9px] text-zinc-500 dark:text-zinc-400">
-                                    score
-                                </p>
-
-                            </div>
-                        </div>
-                    </div>
-
-
-                    <div class="min-w-0 flex-1">
-
-                        <div class="mb-3 flex items-center justify-between gap-2">
-
-                            <span class="text-xs text-zinc-600 dark:text-zinc-400">
-                                Completed
-                            </span>
-
-                            <span
-                                id="sidebar-task-count"
-                                class="text-xs font-medium text-zinc-900 dark:text-white"
-                            >
-                                0 / 0
-                            </span>
-
-                        </div>
-
-                        <div class="h-1.5 overflow-hidden rounded-full bg-blue-100 dark:bg-zinc-800">
-
-                            <div
-                                id="progress-bar"
-                                class="h-full w-0 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 transition-all duration-300"
-                            ></div>
-
-                        </div>
-
-                        <p class="mt-3 text-[11px] leading-4 text-zinc-500 dark:text-zinc-500">
-                            Keep completing tasks to improve your score.
-                        </p>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
+            <!-- ============================================ -->
+            <!-- RIGHT: TASK DEBT                             -->
+            <!-- ============================================ -->
             <div class="rounded-xl border border-blue-200/60 bg-white/90 p-5 shadow-md shadow-blue-500/10 backdrop-blur-sm sm:p-6 transition hover:shadow-lg hover:shadow-blue-500/20 dark:border-zinc-800 dark:bg-zinc-900/80 dark:shadow-black/30">
 
                 <div class="flex items-start justify-between gap-4">
@@ -238,6 +241,7 @@
                         >
                             0
                         </p>
+
                     </div>
 
                 </div>
@@ -288,7 +292,9 @@
 
                 <div
                     id="task-list"
-                    class="divide-y divide-blue-100/70 dark:divide-zinc-800/70"
+                    class="flex gap-4 overflow-x-auto overflow-y-visible px-5 py-4 snap-x snap-mandatory
+                        scrollbar-thin scrollbar-thumb-blue-300 scrollbar-track-transparent
+                        dark:scrollbar-thumb-zinc-700"
                 >
                 </div>
 

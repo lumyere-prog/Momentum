@@ -1,3 +1,5 @@
+import { Chart, registerables } from 'chart.js';
+Chart.register(...registerables);
 document.addEventListener('DOMContentLoaded', () => {
     let tasks = [];
 
@@ -62,6 +64,141 @@ document.addEventListener('DOMContentLoaded', () => {
     const themeToggle = document.getElementById('theme-toggle');
     const themeIconSun = document.getElementById('theme-icon-sun');
     const themeIconMoon = document.getElementById('theme-icon-moon');
+    // ==========================================
+    // WEEKLY COMPLETED LINE CHART
+    // ==========================================
+
+    const weeklyCanvas = document.getElementById('weekly-chart');
+    let weeklyChart = null;
+
+    function getWeekDays() {
+        // Returns Mon..Sun dates for the current week as YYYY-MM-DD
+        const now = new Date();
+        const day = now.getDay(); // 0 = Sun, 1 = Mon, ...
+        const diffToMonday = (day === 0 ? -6 : 1 - day);
+
+        const monday = new Date(now);
+        monday.setDate(now.getDate() + diffToMonday);
+        monday.setHours(0, 0, 0, 0);
+
+        const days = [];
+        for (let i = 0; i < 7; i++) {
+            const d = new Date(monday);
+            d.setDate(monday.getDate() + i);
+            days.push(d);
+        }
+        return days;
+    }
+
+    function buildWeeklyData() {
+        const days = getWeekDays();
+        const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+        const counts = [0, 0, 0, 0, 0, 0, 0];
+
+        tasks.forEach(task => {
+            if (!task.completed) return;
+
+            // Prefer completed_at, fall back to updated_at, then due_date
+            const raw = task.completed_at || task.updated_at || task.due_date || task.dueDate;
+            if (!raw) return;
+
+            const clean = raw.split('T')[0];
+
+            const idx = days.findIndex(d => {
+                const y = d.getFullYear();
+                const m = String(d.getMonth() + 1).padStart(2, '0');
+                const dd = String(d.getDate()).padStart(2, '0');
+                return `${y}-${m}-${dd}` === clean;
+            });
+
+            if (idx !== -1) counts[idx]++;
+        });
+
+        return { labels, counts };
+    }
+
+    function isDarkMode() {
+        return document.documentElement.classList.contains('dark');
+    }
+
+    function chartColors() {
+        const dark = isDarkMode();
+        return {
+            line: '#3b82f6',
+            fill: dark ? 'rgba(59, 130, 246, 0.15)' : 'rgba(59, 130, 246, 0.15)',
+            grid: dark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.06)',
+            tick: dark ? '#a1a1aa' : '#52525b',
+        };
+    }
+
+    function renderWeeklyChart() {
+        if (!weeklyCanvas) return;
+
+        const { labels, counts } = buildWeeklyData();
+        const c = chartColors();
+
+        if (weeklyChart) {
+            weeklyChart.data.labels = labels;
+            weeklyChart.data.datasets[0].data = counts;
+            weeklyChart.data.datasets[0].borderColor = c.line;
+            weeklyChart.data.datasets[0].backgroundColor = c.fill;
+            weeklyChart.options.scales.x.ticks.color = c.tick;
+            weeklyChart.options.scales.y.ticks.color = c.tick;
+            weeklyChart.options.scales.x.grid.color = c.grid;
+            weeklyChart.options.scales.y.grid.color = c.grid;
+            weeklyChart.update();
+            return;
+        }
+
+        weeklyChart = new Chart(weeklyCanvas, {
+            type: 'line',
+            data: {
+                labels,
+                datasets: [{
+                    label: 'Completed',
+                    data: counts,
+                    borderColor: c.line,
+                    backgroundColor: c.fill,
+                    borderWidth: 2,
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: c.line,
+                    pointBorderColor: c.line,
+                    pointRadius: 3,
+                    pointHoverRadius: 5,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        displayColors: false,
+                        callbacks: {
+                            label: (ctx) => `${ctx.parsed.y} task${ctx.parsed.y === 1 ? '' : 's'}`
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { color: c.grid, drawBorder: false },
+                        ticks: { color: c.tick, font: { size: 10 } }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            color: c.tick,
+                            font: { size: 10 },
+                            precision: 0,
+                            stepSize: 1
+                        },
+                        grid: { color: c.grid, drawBorder: false }
+                    }
+                }
+            }
+        });
+    }
 
 
     // ==========================================
@@ -103,13 +240,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Sync icons with whatever the inline head script already applied
     updateThemeIcons();
 
-    if (themeToggle) {
-        themeToggle.addEventListener('click', () => {
-            const isDark = document.documentElement.classList.toggle('dark');
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            updateThemeIcons();
-        });
-    }
+    themeToggle.addEventListener('click', () => {
+        const isDark = document.documentElement.classList.toggle('dark');
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        updateThemeIcons();
+        renderWeeklyChart();
+    });
 
 
     // ==========================================
@@ -311,6 +447,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (productivityCircle) {
             productivityCircle.style.setProperty('--progress', `${percentage}%`);
         }
+        renderWeeklyChart();
 
         updateTaskDebt();
 
@@ -351,7 +488,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (tasks.length === 0) {
             taskList.innerHTML = `
-                <div class="px-5 py-10 text-center">
+                <div class="w-full px-5 py-10 text-center">
                     <div class="text-3xl">✓</div>
                     <p class="mt-3 text-sm font-medium text-zinc-500 dark:text-zinc-300">
                         No tasks yet
@@ -370,28 +507,55 @@ document.addEventListener('DOMContentLoaded', () => {
         tasks.forEach(task => {
             const taskElement = document.createElement('div');
 
+            // Card wrapper — fixed width, snap, group for hover
             taskElement.className =
-                'group flex items-center gap-4 border-b border-blue-100/70 px-5 py-4 transition hover:bg-blue-50/70 cursor-pointer dark:border-zinc-800/70 dark:hover:bg-zinc-800/50';
+                'group relative flex w-64 shrink-0 snap-start flex-col overflow-hidden rounded-2xl border border-blue-200/60 bg-white/90 shadow-md shadow-blue-500/10 backdrop-blur-sm transition hover:shadow-lg hover:shadow-blue-500/20 cursor-pointer dark:border-zinc-800 dark:bg-zinc-900/80 dark:shadow-black/30';
             taskElement.dataset.id = task.id;
 
-            taskElement.innerHTML = `
-                <!-- COMPLETE BUTTON -->
-                <button
-                    class="complete-task flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition
-                    ${
-                        task.completed
-                            ? 'border-emerald-500 bg-emerald-500 text-[10px] font-bold text-black'
-                            : 'border-zinc-400 hover:border-violet-400 hover:bg-violet-400/10 dark:border-zinc-700'
-                    }"
-                    data-id="${task.id}"
-                    title="${task.completed ? 'Mark as incomplete' : 'Complete task'}"
-                >
-                    ${task.completed ? '✓' : ''}
-                </button>
+            // Priority → gradient color for the card "image" area
+            const priorityGradient = {
+                High:   'from-red-300 to-red-200 dark:from-red-900/50 dark:to-red-800/30',
+                Medium: 'from-yellow-200 to-yellow-100 dark:from-yellow-900/50 dark:to-yellow-800/30',
+                Low:    'from-emerald-200 to-emerald-100 dark:from-emerald-900/50 dark:to-emerald-800/30',
+            }[task.priority] || 'from-blue-200 to-indigo-100 dark:from-zinc-800 dark:to-zinc-700';
 
-                <!-- TASK INFORMATION -->
-                <div class="min-w-0 flex-1">
-                    <p class="truncate text-sm font-medium ${
+            taskElement.innerHTML = `
+                <!-- TOP "IMAGE" AREA -->
+                <div class="relative h-28 w-full bg-gradient-to-br ${priorityGradient} flex items-center justify-center">
+
+                    <!-- Priority badge in top-right -->
+                    <span class="absolute top-2 right-2 rounded-md px-2 py-0.5 text-[10px] font-medium ${getPriorityClass(task.priority)}">
+                        ${escapeHtml(task.priority)}
+                    </span>
+
+                    <!-- Big task icon (placeholder image) -->
+                    <svg class="h-10 w-10 text-white/70 dark:text-white/40" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                        <rect x="3" y="5" width="18" height="14" rx="2" />
+                        <circle cx="9" cy="11" r="1.5" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 17l-4.5-4.5L9 20" />
+                    </svg>
+
+                    <!-- Complete toggle (top-left) -->
+                    <button
+                        class="complete-task absolute top-2 left-2 flex h-6 w-6 items-center justify-center rounded-full border transition
+                        ${
+                            task.completed
+                                ? 'border-emerald-500 bg-emerald-500 text-[11px] font-bold text-white'
+                                : 'border-white/80 bg-white/40 hover:bg-white/70 dark:border-zinc-600 dark:bg-zinc-800/60 dark:hover:bg-zinc-700/80'
+                        }"
+                        data-id="${task.id}"
+                        title="${task.completed ? 'Mark as incomplete' : 'Complete task'}"
+                    >
+                        ${task.completed ? '✓' : ''}
+                    </button>
+
+                </div>
+
+                <!-- BOTTOM CONTENT -->
+                <div class="flex flex-1 flex-col p-4">
+
+                    <!-- Title -->
+                    <p class="line-clamp-2 text-sm font-semibold ${
                         task.completed
                             ? 'text-zinc-500 line-through dark:text-zinc-500'
                             : 'text-zinc-900 dark:text-zinc-100'
@@ -399,32 +563,37 @@ document.addEventListener('DOMContentLoaded', () => {
                         ${escapeHtml(task.title)}
                     </p>
 
-                    <!-- PRIORITY + CATEGORY + DATE ROW -->
-                    <div class="mt-2 flex flex-wrap items-center gap-2">
-                        <span class="rounded-md px-2 py-0.5 text-[10px] font-medium ${getPriorityClass(task.priority)}">
-                            ${escapeHtml(task.priority)}
-                        </span>
+                    <!-- Placeholder "content lines" like the reference -->
+                    <div class="mt-3 space-y-1.5">
+                        <div class="h-2 w-3/4 rounded-full bg-blue-100 dark:bg-zinc-800"></div>
+                        <div class="h-2 w-1/2 rounded-full bg-blue-100 dark:bg-zinc-800"></div>
+                    </div>
+
+                    <!-- Category + Date chips -->
+                    <div class="mt-4 flex flex-wrap items-center gap-2">
 
                         ${
                             task.category
-                                ? `<span class="text-[11px] text-zinc-600 dark:text-zinc-400">${escapeHtml(task.category)}</span>`
+                                ? `<span class="rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-medium text-blue-700 dark:bg-zinc-800 dark:text-zinc-300">${escapeHtml(task.category)}</span>`
                                 : ''
                         }
 
-                        <span class="text-[11px] text-zinc-500 dark:text-zinc-400">
+                        <span class="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-medium text-zinc-600 dark:bg-zinc-800/60 dark:text-zinc-400">
                             ${escapeHtml(formatDisplayDate(task.due_date || task.dueDate))}
                         </span>
-                    </div>
-                </div>
 
-                <!-- DELETE -->
-                <button
-                    class="delete-task opacity-0 transition group-hover:opacity-100 text-zinc-500 hover:text-red-400 dark:text-zinc-400"
-                    data-id="${task.id}"
-                    title="Delete task"
-                >
-                    ×
-                </button>
+                    </div>
+
+                    <!-- Delete (bottom-right, hidden until hover) -->
+                    <button
+                        class="delete-task absolute bottom-3 right-3 flex h-6 w-6 items-center justify-center rounded-full text-zinc-400 opacity-0 transition group-hover:opacity-100 hover:text-red-500 dark:text-zinc-500 cursor-pointer"
+                        data-id="${task.id}"
+                        title="Delete task"
+                    >
+                        ×
+                    </button>
+
+                </div>
             `;
 
             taskList.appendChild(taskElement);

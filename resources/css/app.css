@@ -24,3 +24,16 @@
     inherits: false;
     initial-value: 0%;
 }
+#task-list::-webkit-scrollbar {
+    height: 8px;
+}
+#task-list::-webkit-scrollbar-thumb {
+    background: rgba(59, 130, 246, 0.4);
+    border-radius: 9999px;
+}
+#task-list::-webkit-scrollbar-thumb:hover {
+    background: rgba(59, 130, 246, 0.6);
+}
+#task-list::-webkit-scrollbar-track {
+    background: transparent;
+}

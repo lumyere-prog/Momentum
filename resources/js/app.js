@@ -2,9 +2,6 @@ import { Chart, registerables } from 'chart.js';
 Chart.register(...registerables);
 
 document.addEventListener('DOMContentLoaded', () => {
-    // ==========================================
-    // STATE
-    // ==========================================
     let tasks = [];
     let activeIndex = 0;
     let weeklyChart = null;
@@ -15,13 +12,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let searchDate = '';
     let currentTask = null;
 
-    // pagination
     let currentPage = 1;
     const TASKS_PER_PAGE = 10;
 
-    // ==========================================
-    // PAGE DETECTION (robust)
-    // ==========================================
     const taskListEl = document.getElementById('task-list');
 
     const isDashboard  = !!document.getElementById('weekly-chart');
@@ -32,9 +25,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
 
-    // ==========================================
-    // ASSETS (from Blade with fallback)
-    // ==========================================
     const ASSETS = window.APP_ASSETS || {
         bin:   '/images/bin.png',
         edit:  '/images/edit.png',
@@ -43,9 +33,6 @@ document.addEventListener('DOMContentLoaded', () => {
         undo:  '/images/undo.png',
     };
 
-    // ==========================================
-    // DEBUG
-    // ==========================================
     console.log('=== Momentum DEBUG ===');
     console.log('isDashboard:', isDashboard);
     console.log('isTaskPage:', isTaskPage);
@@ -54,9 +41,6 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('#search-name:', document.getElementById('search-name'));
     console.log('======================');
 
-    // ==========================================
-    // HELPERS (shared)
-    // ==========================================
     function escapeHtml(value) {
         const div = document.createElement('div');
         div.textContent = value ?? '';
@@ -121,9 +105,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // ==========================================
-    // THEME
-    // ==========================================
     const themeToggle   = document.getElementById('theme-toggle');
     const themeIconSun  = document.getElementById('theme-icon-sun');
     const themeIconMoon = document.getElementById('theme-icon-moon');
@@ -145,9 +126,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ==========================================
-    // FETCH TASKS (skip on task details page)
-    // ==========================================
     if (!isTaskDetail) {
         fetch('/tasks', {
             headers: { 'Accept': 'application/json' }
@@ -171,9 +149,6 @@ document.addEventListener('DOMContentLoaded', () => {
         .catch(error => console.error('Error loading tasks:', error));
     }
 
-    // ==========================================
-    // SHARED ELEMENTS
-    // ==========================================
     const taskList          = document.getElementById('task-list');
     const addTaskButton     = document.getElementById('add-task');
     const addTaskFooter     = document.getElementById('add-task-footer');
@@ -193,20 +168,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const weeklyCanvas = document.getElementById('weekly-chart');
 
-    // Pagination elements
     const paginationControls = document.getElementById('pagination-controls');
     const paginationInfo     = document.getElementById('pagination-info');
     const paginationPrev     = document.getElementById('pagination-prev');
     const paginationNext     = document.getElementById('pagination-next');
     const paginationPages    = document.getElementById('pagination-pages');
 
-    // Dashboard cards
     const todayTasksCard = document.getElementById('today-tasks-card');
     const completedCard  = document.getElementById('completed-card');
 
-    // ==========================================
-    // VIEW MODAL (shared)
-    // ==========================================
     function openViewTaskModal(task) {
         if (!viewTaskModal || !task) return;
 
@@ -248,9 +218,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ==========================================
-    // WEEKLY CHART
-    // ==========================================
     function getWeekDays() {
         const now = new Date();
         const day = now.getDay();
@@ -372,9 +339,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ==========================================
-    // ADD TASK MODAL
-    // ==========================================
     function openTaskModal() {
         if (!taskModal) return;
         taskModal.classList.remove('hidden');
@@ -401,9 +365,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ==========================================
-    // OVERDUE / DEBT
-    // ==========================================
     function getOverdueTasks() {
         const today = new Date().toISOString().split('T')[0];
         return tasks.filter(task => {
@@ -435,9 +396,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // ==========================================
-    // STATS
-    // ==========================================
     function updateStats() {
         const total = tasks.length;
         const completed = tasks.filter(t => t.completed).length;
@@ -471,9 +429,6 @@ document.addEventListener('DOMContentLoaded', () => {
         updateTaskDebt();
     }
 
-    // ==========================================
-    // ROCKET POPUP
-    // ==========================================
     function showRocketCongrats(message = 'Congrats! 🎉') {
         document.querySelectorAll('.rocket-popup').forEach(el => el.remove());
 
@@ -491,9 +446,6 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => popup.remove(), 2000);
     }
 
-    // ==========================================
-    // TOGGLE COMPLETE
-    // ==========================================
     async function toggleTaskComplete(id, options = {}) {
         const { showRocket = false } = options;
         const task = tasks.find(t => Number(t.id) === Number(id));
@@ -526,9 +478,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // ==========================================
-    // FILTER + SEARCH
-    // ==========================================
     function getVisibleTasks() {
         const filtered = tasks.filter(task => {
             if (currentFilter === 'finished' && !task.completed) return false;
@@ -601,9 +550,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     updateFilterButtonStyles();
 
-    // ==========================================
-    // READ ?filter= FROM URL
-    // ==========================================
     if (isTaskPage) {
         const urlFilter = new URLSearchParams(window.location.search).get('filter');
         if (urlFilter && ['all', 'unfinished', 'finished'].includes(urlFilter)) {
@@ -613,9 +559,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // ==========================================
-    // DASHBOARD CAROUSEL CARDS
-    // ==========================================
     function buildTaskCard(task) {
         const el = document.createElement('div');
 
@@ -797,9 +740,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 120);
     });
 
-    // ==========================================
-    // TASK PAGE LIST (TABLE + PAGINATION)
-    // ==========================================
     function renderTaskPageList() {
         if (!taskList) return;
         taskList.innerHTML = '';
@@ -807,7 +747,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const visibleTasks = getVisibleTasks();
         const total = visibleTasks.length;
 
-        // Empty state
         if (total === 0) {
             const message = tasks.length === 0
                 ? 'Add a task and get things done.'
@@ -837,7 +776,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Pagination math
         const totalPages = Math.max(1, Math.ceil(total / TASKS_PER_PAGE));
         if (currentPage > totalPages) currentPage = totalPages;
         if (currentPage < 1) currentPage = 1;
@@ -846,7 +784,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const endIdx    = Math.min(startIdx + TASKS_PER_PAGE, total);
         const pageTasks = visibleTasks.slice(startIdx, endIdx);
 
-        // Render rows
         pageTasks.forEach((task) => {
             const isDone = task.completed === true || task.completed === 1 || task.completed === '1';
 
@@ -910,24 +847,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
                         <button
                             type="button"
-                            class="view-task inline-flex h-8 w-8 items-center justify-center rounded-md border border-transparent text-zinc-500 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 cursor-pointer dark:text-zinc-400 dark:hover:border-zinc-700 dark:hover:bg-zinc-700 dark:hover:text-white"
-                            data-id="${task.id}"
-                            title="View"
-                        >
-                            <img src="${ASSETS.eye}" alt="" class="h-4 w-4">
-                        </button>
-
-                        <button
-                            type="button"
-                            class="edit-task inline-flex h-8 w-8 items-center justify-center rounded-md border border-transparent text-zinc-500 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 cursor-pointer dark:text-zinc-400 dark:hover:border-zinc-700 dark:hover:bg-zinc-700 dark:hover:text-white"
-                            data-id="${task.id}"
-                            title="Edit"
-                        >
-                            <img src="${ASSETS.edit}" alt="" class="h-4 w-4">
-                        </button>
-
-                        <button
-                            type="button"
                             class="delete-task inline-flex h-8 w-8 items-center justify-center rounded-md border border-transparent text-zinc-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600 cursor-pointer dark:text-zinc-400 dark:hover:border-zinc-700 dark:hover:bg-zinc-700 dark:hover:text-red-400"
                             data-id="${task.id}"
                             title="Delete"
@@ -950,9 +869,6 @@ document.addEventListener('DOMContentLoaded', () => {
         renderPagination(total, totalPages, startIdx, endIdx);
     }
 
-    // ==========================================
-    // PAGINATION RENDER
-    // ==========================================
     function renderPagination(total, totalPages, startIdx, endIdx) {
         if (!paginationControls) return;
 
@@ -1017,9 +933,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return pages;
     }
 
-    // ==========================================
-    // PAGINATION HANDLERS
-    // ==========================================
     if (paginationPrev) {
         paginationPrev.addEventListener('click', () => {
             if (currentPage > 1) {
@@ -1055,9 +968,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ==========================================
-    // MASTER RENDER
-    // ==========================================
     function renderTasks() {
         if (isTaskDetail) return;
         if (!taskList) return;
@@ -1068,7 +978,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Dashboard → carousel
         taskList.innerHTML = '';
 
         const carouselTasks = getCarouselTasks();
@@ -1108,9 +1017,6 @@ document.addEventListener('DOMContentLoaded', () => {
         updateTaskDebt();
     }
 
-    // ==========================================
-    // CLICK HANDLER
-    // ==========================================
     let clickTimer = null;
 
     if (taskList) {
@@ -1121,7 +1027,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const card         = event.target.closest('.task-card');
             const row          = event.target.closest('tr[data-id]');
 
-            // 1a. View → open modal
             if (viewButton) {
                 event.stopPropagation();
                 const id = Number(viewButton.dataset.id);
@@ -1130,7 +1035,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // 1b. Edit → navigate to task details
             if (editButton) {
                 event.stopPropagation();
                 const id = Number(editButton.dataset.id);
@@ -1138,7 +1042,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // 1c. Delete
             if (deleteButton) {
                 event.stopPropagation();
                 const id = Number(deleteButton.dataset.id);
@@ -1164,7 +1067,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // 2. Dashboard card click → navigate
             if (isDashboard && card) {
                 const i = Number(card.dataset.index);
                 if (Number.isNaN(i)) return;
@@ -1178,7 +1080,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // 3. Task page row click → navigate after delay
             if (isTaskPage && row) {
                 if (clickTimer) clearTimeout(clickTimer);
                 clickTimer = setTimeout(() => {
@@ -1215,16 +1116,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ==========================================
-    // CREATE TASK
-    // ==========================================
     if (taskForm) {
     taskForm.addEventListener('submit', async (event) => {
         event.preventDefault();
 
         const saveTaskBtn = document.getElementById('save-task-btn');
 
-        // Disable button immediately to prevent duplicate submissions
         saveTaskBtn.disabled = true;
         saveTaskBtn.textContent = 'Saving...';
 
@@ -1263,23 +1160,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.error("Validation Failed:", errorData.errors);
                 alert("Failed to save task. Please check your inputs.");
 
-                // Re-enable if saving failed
                 saveTaskBtn.disabled = false;
                 saveTaskBtn.textContent = 'Save Task';
             }
         } catch (error) {
             console.error("Network Error:", error);
 
-            // Re-enable if there was a network error
             saveTaskBtn.disabled = false;
             saveTaskBtn.textContent = 'Save Task';
         }
     });
 }
 
-    // ==========================================
-    // DEBT MODAL
-    // ==========================================
     function renderDebtTasks() {
         if (!debtTaskList) return;
 
@@ -1360,9 +1252,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ==========================================
-    // DASHBOARD CARDS
-    // ==========================================
     if (todayTasksCard) {
         todayTasksCard.addEventListener('click', () => {
             const target = document.getElementById('today-tasks-section');
@@ -1379,9 +1268,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ==========================================
-    // FILTER CARD — SLIDE UP/DOWN ON SCROLL (no fade)
-    // ==========================================
     (function initAutoHideFilter() {
         if (!isTaskPage) return;
 
@@ -1407,14 +1293,12 @@ document.addEventListener('DOMContentLoaded', () => {
         function onScroll() {
             const currentScrollY = window.scrollY;
 
-            // Always show near the top of the page
             if (currentScrollY < 80) {
                 showFilter();
                 lastScrollY = currentScrollY;
                 return;
             }
 
-            // Scroll down → hide; scroll up → show
             if (currentScrollY > lastScrollY + 6) {
                 hideFilter();
             } else if (currentScrollY < lastScrollY - 6) {
@@ -1437,16 +1321,10 @@ document.addEventListener('DOMContentLoaded', () => {
         showFilter();
     })();
 
-    // ==========================================
-    // INITIAL LOAD
-    // ==========================================
     if (!isTaskDetail) {
         renderTasks();
     }
 
-    // ================================================================
-    // TASK DETAILS PAGE
-    // ================================================================
     if (isTaskDetail) {
         initTaskDetailsPage();
     }

@@ -1,5 +1,10 @@
 <?php
 
+// 🩺 TEMPORARY DIAGNOSTIC — remove after fixing
+if (headers_sent($sentFile, $sentLine)) {
+    die("HEADERS ALREADY SENT FROM: {$sentFile} on line {$sentLine}");
+}
+
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 

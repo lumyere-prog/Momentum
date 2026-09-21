@@ -30,6 +30,18 @@ RUN apt-get update && apt-get install -y nodejs npm \
     && npm run build \
     && rm -rf /var/lib/apt/lists/*
 
+# 🆕 Create entrypoint script that runs BEFORE the container starts
+RUN echo '#!/bin/bash\n\
+set -e\n\
+echo "=== Running migrations ==="\n\
+php /var/www/html/artisan migrate --force\n\
+echo "=== Caching config ==="\n\
+php /var/www/html/artisan config:cache\n\
+echo "=== Caching routes ==="\n\
+php /var/www/html/artisan route:cache\n\
+' > /etc/entrypoint.d/99-laravel-init.sh \
+    && chmod +x /etc/entrypoint.d/99-laravel-init.sh
+
 # Fix permissions
 RUN mkdir -p /var/www/html/storage/framework/sessions \
     && mkdir -p /var/www/html/storage/framework/views \
@@ -39,10 +51,4 @@ RUN mkdir -p /var/www/html/storage/framework/sessions \
     && chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-# 🆕 Run migrations automatically at container start
-COPY --chown=www-data:www-data docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
-
 USER www-data
-
-ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]

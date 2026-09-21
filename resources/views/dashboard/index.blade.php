@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
@@ -39,18 +38,11 @@
                         >
                     </div>
 
-                   <div class="flex min-w-0 flex-col gap-1 sm:flex-row sm:items-center sm:gap-3">
-    <p class="mt-0 text-sm font-bold text-zinc-900 sm:text-base md:text-lg dark:text-zinc-100">
-        Make a list, Conquer your day!
-    </p>
-
-    <a
-        href="{{ route('task') }}"
-        class="inline-flex shrink-0 items-center gap-1 rounded-lg border border-blue-200 bg-white/70 px-3 py-1.5 text-xs font-medium text-blue-700 shadow-sm transition hover:bg-blue-50 hover:text-blue-800 dark:border-zinc-700 dark:bg-zinc-800/70 dark:text-zinc-200 dark:hover:bg-zinc-700 dark:hover:text-white"
-    >
-        View all Task →
-    </a>
-</div>
+                    <div class="flex min-w-0 flex-col gap-1">
+                        <p class="mt-0 text-sm font-bold text-zinc-900 sm:text-base md:text-lg dark:text-zinc-100">
+                            Make a list, Conquer your day!
+                        </p>
+                    </div>
 
                 </div>
 
@@ -91,7 +83,7 @@
             <button
                 id="add-task"
                 type="button"
-                class="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-blue-400 px-4  py-2.5 text-sm font-semibold text-white shadow-lg shadow-blue-500/30 transition hover:from-blue-700 hover:to-indigo-700 cursor-pointer sm:w-full"
+                class="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-blue-400 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-blue-500/30 transition hover:from-blue-700 hover:to-indigo-700 cursor-pointer sm:w-full"
             >
                 <span class="text-base">+</span>
                 Add task
@@ -118,7 +110,7 @@
 
                 <div class="mt-6 flex flex-col items-center gap-6">
 
-                    <!-- Donut graph (unchanged) -->
+                    <!-- Donut graph -->
                     <div
                         id="productivity-circle"
                         class="productivity-circle relative flex h-36 w-36 shrink-0 items-center justify-center rounded-full"
@@ -142,7 +134,7 @@
                         </div>
                     </div>
 
-                    <!-- Line graph (weekly completed) -->
+                    <!-- Line graph -->
                     <div class="w-full">
 
                         <div class="mb-3 flex items-center justify-between gap-2">
@@ -175,9 +167,13 @@
             </div>
 
             <!-- ============================================ -->
-            <!-- RIGHT: TODAY'S TASKS                         -->
+            <!-- RIGHT: TODAY'S TASKS (clickable → scroll)    -->
             <!-- ============================================ -->
-            <div class="min-w-0 rounded-xl border border-blue-200/60 bg-white/90 p-5 shadow-md shadow-blue-500/10 backdrop-blur-sm sm:p-6 transition hover:shadow-lg hover:shadow-blue-500/20 dark:border-zinc-800 dark:bg-zinc-900/80 dark:shadow-black/30">
+            <button
+                type="button"
+                id="today-tasks-card"
+                class="text-left min-w-0 rounded-xl border border-blue-200/60 bg-white/90 p-5 shadow-md shadow-blue-500/10 backdrop-blur-sm sm:p-6 transition hover:shadow-lg hover:shadow-blue-500/20 hover:border-blue-300 hover:bg-blue-50/60 dark:border-zinc-800 dark:bg-zinc-900/80 dark:shadow-black/30 dark:hover:border-zinc-700 dark:hover:bg-zinc-800/60 cursor-pointer"
+            >
 
                 <p class="text-xs font-medium uppercase tracking-wider text-black dark:text-blue-400">
                     Today's tasks
@@ -198,12 +194,17 @@
 
                 </div>
 
-            </div>
+            </button>
 
             <!-- ============================================ -->
-            <!-- RIGHT: COMPLETED                             -->
+            <!-- RIGHT: COMPLETED (clickable → /task filter)  -->
             <!-- ============================================ -->
-            <div class="min-w-0 rounded-xl border border-blue-200/60 bg-white/90 p-5 shadow-md shadow-blue-500/10 backdrop-blur-sm sm:p-6 transition hover:shadow-lg hover:shadow-blue-500/20 dark:border-zinc-800 dark:bg-zinc-900/80 dark:shadow-black/30">
+            <button
+                type="button"
+                id="completed-card"
+                data-href="/task?filter=finished"
+                class="text-left min-w-0 rounded-xl border border-blue-200/60 bg-white/90 p-5 shadow-md shadow-blue-500/10 backdrop-blur-sm sm:p-6 transition hover:shadow-lg hover:shadow-blue-500/20 hover:border-blue-300 hover:bg-blue-50/60 dark:border-zinc-800 dark:bg-zinc-900/80 dark:shadow-black/30 dark:hover:border-zinc-700 dark:hover:bg-zinc-800/60 cursor-pointer"
+            >
 
                 <p class="text-xs font-medium uppercase tracking-wider text-black dark:text-blue-400">
                     Completed
@@ -227,7 +228,7 @@
 
                 </div>
 
-            </div>
+            </button>
 
             <!-- ============================================ -->
             <!-- RIGHT: TASK DEBT                             -->
@@ -277,7 +278,10 @@
         <div class="grid grid-cols-1 gap-2 lg:grid-cols-[minmax(0,1fr)_-10px]">
 
 
-            <section class="min-w-0 overflow-hidden rounded-xl border border-blue-200/60 bg-white/90 shadow-md shadow-blue-500/10 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-900/80 dark:shadow-black/30">
+            <section
+                id="today-tasks-section"
+                class="min-w-0 overflow-hidden rounded-xl border border-blue-200/60 bg-white/90 shadow-md shadow-blue-500/10 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-900/80 dark:shadow-black/30"
+            >
 
                 <div class="flex flex-col gap-3 border-b border-blue-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 dark:border-zinc-800">
 
@@ -293,6 +297,14 @@
                         </p>
 
                     </div>
+
+                    {{-- 🆕 MOVED HERE: View all Task button --}}
+                    <a
+                        href="{{ route('task') }}"
+                        class="inline-flex shrink-0 items-center gap-1 rounded-lg border border-blue-200 bg-white/70 px-3 py-1.5 text-xs font-medium text-blue-700 shadow-sm transition hover:bg-blue-50 hover:text-blue-800 dark:border-zinc-700 dark:bg-zinc-800/70 dark:text-zinc-200 dark:hover:bg-zinc-700 dark:hover:text-white"
+                    >
+                        View all Task →
+                    </a>
 
                 </div>
 

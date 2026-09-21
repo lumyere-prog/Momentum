@@ -3,7 +3,6 @@ FROM richarvey/nginx-php-fpm:latest
 COPY . .
 
 # Image config
-ENV SKIP_COMPOSER 1
 ENV WEBROOT /var/www/html/public
 ENV PHP_ERRORS_STDERR 1
 ENV RUN_SCRIPTS 1
@@ -16,5 +15,9 @@ ENV LOG_CHANNEL stderr
 
 # Allow composer to run as root
 ENV COMPOSER_ALLOW_SUPERUSER 1
+
+# Let the image run composer install during build
+ENV SKIP_COMPOSER 0
+ENV COMPOSER_MEMORY_LIMIT -1
 
 CMD ["/start.sh"]

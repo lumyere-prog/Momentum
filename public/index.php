@@ -1,25 +1,27 @@
 <?php
 
-// 🩺 TEMPORARY DIAGNOSTIC — remove after fixing
-if (headers_sent($sentFile, $sentLine)) {
-    die("HEADERS ALREADY SENT FROM: {$sentFile} on line {$sentLine}");
-}
+// 🩺 TEMPORARY DIAGNOSTIC
+error_log("=== BOOT START ===");
+error_log("Headers sent? " . (headers_sent($f, $l) ? "YES: {$f}:{$l}" : "NO"));
 
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 
 define('LARAVEL_START', microtime(true));
 
-// Determine if the application is in maintenance mode...
+error_log("=== MAINTENANCE CHECK ===");
 if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php')) {
     require $maintenance;
 }
 
-// Register the Composer autoloader...
+error_log("=== AUTOLOAD ===");
 require __DIR__.'/../vendor/autoload.php';
 
-// Bootstrap Laravel and handle the request...
+error_log("=== BOOTSTRAP ===");
 /** @var Application $app */
 $app = require_once __DIR__.'/../bootstrap/app.php';
 
+error_log("=== HANDLE REQUEST ===");
 $app->handleRequest(Request::capture());
+
+error_log("=== REQUEST HANDLED ===");

@@ -24,13 +24,25 @@ RUN composer install \
     --prefer-dist \
     --optimize-autoloader
 
-# 🆕 Install Node, build Vite assets
+# Install Node + build Vite assets
 RUN apt-get update && apt-get install -y nodejs npm \
     && npm ci \
     && npm run build \
     && rm -rf /var/lib/apt/lists/*
 
 # Fix permissions
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+RUN mkdir -p /var/www/html/storage/framework/sessions \
+    && mkdir -p /var/www/html/storage/framework/views \
+    && mkdir -p /var/www/html/storage/framework/cache/data \
+    && mkdir -p /var/www/html/storage/logs \
+    && mkdir -p /var/www/html/bootstrap/cache \
+    && chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
+    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+
+# 🆕 Run migrations automatically at container start
+COPY --chown=www-data:www-data docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 USER www-data
+
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]

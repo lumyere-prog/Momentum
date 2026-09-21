@@ -6,12 +6,21 @@ use App\Models\Task;
 use App\Models\Comment;
 use Illuminate\Http\Request;
 
+
 class TaskController extends Controller
 {
+    
+    
     // Fetch all tasks for the dashboard
     public function index()
     {
         return response()->json(Task::orderBy('created_at', 'desc')->get());
+    }
+
+        // Show a specific task
+    public function show(Task $task)
+    {
+        return view('task.taskdetails', compact('task'));
     }
 
     // Save the data from your modal

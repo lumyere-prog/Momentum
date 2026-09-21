@@ -1134,7 +1134,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (editButton) {
                 event.stopPropagation();
                 const id = Number(editButton.dataset.id);
-                window.location.href = `/taskdetails?task=${id}`;
+                window.location.href = `/task/${id}`;
                 return;
             }
 
@@ -1170,7 +1170,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (Number.isNaN(i)) return;
 
                 if (i === activeIndex) {
-                    window.location.href = `/taskdetails?task=${card.dataset.id}`;
+                    window.location.href = `/task/${card.dataset.id}`;
                 } else {
                     activeIndex = i;
                     applyCarouselLayout();
@@ -1182,7 +1182,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (isTaskPage && row) {
                 if (clickTimer) clearTimeout(clickTimer);
                 clickTimer = setTimeout(() => {
-                    window.location.href = `/taskdetails?task=${row.dataset.id}`;
+                    window.location.href = `/task/${row.dataset.id}`;
                 }, 250);
             }
         });
@@ -1219,49 +1219,63 @@ document.addEventListener('DOMContentLoaded', () => {
     // CREATE TASK
     // ==========================================
     if (taskForm) {
-        taskForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
+    taskForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
 
-            const titleInput       = document.getElementById('task-title');
-            const descriptionInput = document.getElementById('task-description');
-            const priorityInput    = document.getElementById('task-priority');
-            const categoryInput    = document.getElementById('task-category');
-            const dueDateInput     = document.getElementById('task-due-date');
+        const saveTaskBtn = document.getElementById('save-task-btn');
 
-            try {
-                const response = await fetch('/tasks', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken
-                    },
-                    body: JSON.stringify({
-                        title: titleInput.value.trim(),
-                        description: descriptionInput ? descriptionInput.value.trim() : '',
-                        priority: priorityInput.value,
-                        category: categoryInput.value.trim(),
-                        due_date: dueDateInput.value
-                    })
-                });
+        // Disable button immediately to prevent duplicate submissions
+        saveTaskBtn.disabled = true;
+        saveTaskBtn.textContent = 'Saving...';
 
-                if (response.ok) {
-                    const newRecord = await response.json();
-                    tasks.unshift(newRecord.task);
-                    saveTasks();
-                    renderTasks();
-                    taskForm.reset();
-                    closeTaskModal();
-                } else {
-                    const errorData = await response.json();
-                    console.error("Validation Failed:", errorData.errors);
-                    alert("Failed to save task. Please check your inputs.");
-                }
-            } catch (error) {
-                console.error("Network Error:", error);
+        const titleInput       = document.getElementById('task-title');
+        const descriptionInput = document.getElementById('task-description');
+        const priorityInput    = document.getElementById('task-priority');
+        const categoryInput    = document.getElementById('task-category');
+        const dueDateInput      = document.getElementById('task-due-date');
+
+        try {
+            const response = await fetch('/tasks', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({
+                    title: titleInput.value.trim(),
+                    description: descriptionInput ? descriptionInput.value.trim() : '',
+                    priority: priorityInput.value,
+                    category: categoryInput.value.trim(),
+                    due_date: dueDateInput.value
+                })
+            });
+
+            if (response.ok) {
+                const newRecord = await response.json();
+                tasks.unshift(newRecord.task);
+                saveTasks();
+                renderTasks();
+                taskForm.reset();
+                closeTaskModal();
+            } else {
+                const errorData = await response.json();
+                console.error("Validation Failed:", errorData.errors);
+                alert("Failed to save task. Please check your inputs.");
+
+                // Re-enable if saving failed
+                saveTaskBtn.disabled = false;
+                saveTaskBtn.textContent = 'Save Task';
             }
-        });
-    }
+        } catch (error) {
+            console.error("Network Error:", error);
+
+            // Re-enable if there was a network error
+            saveTaskBtn.disabled = false;
+            saveTaskBtn.textContent = 'Save Task';
+        }
+    });
+}
 
     // ==========================================
     // DEBT MODAL
@@ -1438,8 +1452,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function initTaskDetailsPage() {
-        const params = new URLSearchParams(window.location.search);
-        const taskId = params.get('task');
+        const taskId = window.location.pathname.split('/').pop();
 
         const editTaskBtn       = document.getElementById('edit-task-btn');
         const editTaskModal     = document.getElementById('edit-task-modal');

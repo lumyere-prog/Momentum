@@ -461,12 +461,13 @@
             </div>
 
 
-            <button
-                type="submit"
-                class="mt-2 w-full rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-blue-500/30 transition hover:from-blue-700 hover:to-indigo-700 cursor-pointer"
-            >
-                Save Task
-            </button>
+           <button
+    type="submit"
+    id="save-task-btn"
+    class="mt-2 w-full rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-blue-500/30 transition hover:from-blue-700 hover:to-indigo-700 cursor-pointer"
+>
+    Save Task
+</button>
 
         </form>
 

@@ -1,5 +1,6 @@
 FROM richarvey/nginx-php-fpm:latest
 
+# Copy your application code
 COPY . .
 
 # Image config
@@ -16,8 +17,10 @@ ENV LOG_CHANNEL stderr
 # Allow composer to run as root
 ENV COMPOSER_ALLOW_SUPERUSER 1
 
-# Let the image run composer install during build
-ENV SKIP_COMPOSER 0
-ENV COMPOSER_MEMORY_LIMIT -1
+# Install PHP dependencies
+RUN composer install --no-dev --no-interaction --no-progress --optimize-autoloader --working-dir=/var/www/html
+
+# Tell the start.sh to skip composer because we already handled it
+ENV SKIP_COMPOSER 1
 
 CMD ["/start.sh"]

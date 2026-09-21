@@ -159,8 +159,11 @@
                         class="w-full rounded-lg border border-blue-200 bg-blue-50/50 px-3 py-2.5 text-sm text-zinc-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white">
                 </div>
 
-                <button type="submit"
-                    class="btn-gradient press-scale mt-2 w-full rounded-lg bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-blue-500/30 transition hover:shadow-xl hover:shadow-blue-500/40 cursor-pointer">
+                <button
+                    id="save-task-btn"
+                    type="submit"
+                    class="mt-2 w-full rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-blue-500/30 transition hover:from-blue-700 hover:to-indigo-700 cursor-pointer"
+                >
                     Save Task
                 </button>
             </form>
